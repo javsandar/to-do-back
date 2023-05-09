@@ -31,10 +31,10 @@ public class TodoController {
     }
 
 
-//    @PutMapping("/todos/{id}")
-//     public void updateTodo(@RequestBody Todo todo, @PathVariable int id) {
-//        todoService.updateTodo(todo, id);
-//    }
+    @PutMapping("/todos/{id}")
+     public Todo updateTodo(@RequestBody @Valid Todo todo, @PathVariable UUID id) {
+       return todoService.updateTodoBoolean(id);
+    }
 //    @DeleteMapping("/todos/{id}")
 //    public void deleteTodo(@PathVariable int id) {
 //        todoService.deleteTodo(id);

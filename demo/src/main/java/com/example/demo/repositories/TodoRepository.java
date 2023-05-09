@@ -15,12 +15,4 @@ public class TodoRepository {
         return todos;
     }
 
-    public void setTodos(List<Todo> todos) {
-        this.todos = todos;
-    }
-
-    public Todo add(Todo todo) {
-        getTodos().add(todo);
-        return todo;
-    }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.adapters.TodoAdapter;
 import com.example.demo.helpers.UUIDhelper;
 import com.example.demo.models.Todo;
 import com.example.demo.repositories.TodoRepository;
@@ -31,6 +32,9 @@ public class TodoServiceTest {
     @Mock
     private TodoRepository todoRepository;
 
+    @Mock
+    private TodoAdapter todoAdapter;
+
     private List<Todo> todos;
 
     @BeforeEach
@@ -61,9 +65,9 @@ public class TodoServiceTest {
     @Test
     public void givenNewTodo_whenAddTodo_thenTodoIsAddedToList() {
         Todo newTodo = new Todo("", false);
-        when(todoRepository.add(newTodo)).thenReturn(newTodo);
+        when(todoAdapter.add(newTodo)).thenReturn(newTodo);
         Todo result = todoService.addTodo(newTodo);
-        then(todoRepository).should(times(1)).add(newTodo);
+        then(todoAdapter).should(times(1)).add(newTodo);
         assertEquals(result, newTodo);
         assertNotNull(newTodo.getId());
     }

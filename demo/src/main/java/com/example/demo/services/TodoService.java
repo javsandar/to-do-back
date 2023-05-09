@@ -1,5 +1,6 @@
 package com.example.demo.services;
 
+import com.example.demo.adapters.TodoAdapter;
 import com.example.demo.helpers.UUIDhelper;
 import com.example.demo.models.Todo;
 import com.example.demo.repositories.TodoRepository;
@@ -13,6 +14,9 @@ import java.util.UUID;
 public class TodoService {
     @Autowired
     private TodoRepository todoRepository;
+
+    @Autowired
+    private TodoAdapter todoAdapter;
 
     /**
      * Metodo para filtrar eventos pendientes y no pendientes, se pasa la variable booleana finished
@@ -40,20 +44,16 @@ public class TodoService {
 
     public Todo addTodo(Todo todo) {
         todo.setId(UUIDhelper.generateRandomUUID());
-        return todoRepository.add(todo);
+        return todoAdapter.add(todo);
     }
 
     public Todo getTodo(UUID id) {
-        return todoRepository.getTodos().stream().filter(todo -> todo.getId().equals(id)).findFirst().get();
+        return todoRepository.getTodos().stream().filter(t -> t.getId().equals(id)).findFirst().get();
     }
 
-//    public void updateTodo(Todo todo, int id) {
-//        for (Todo t : todoRepository.getTodos()) {
-//            if (t.getId() == todo.getId()) {
-//                t.setId();
-//            }
-//        }
-//    }
+    public Todo updateTodoBoolean(UUID id) {
+        return todoAdapter.update(id);
+    }
 
 //    public void deleteTodo(UUID id) {
 //        todoRepository.getTodos().removeIf(t -> t.getId() == id);
