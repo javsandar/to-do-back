@@ -2,6 +2,8 @@ package com.example.demo.controllers;
 
 import com.example.demo.helpers.UUIDhelper;
 import com.example.demo.models.Todo;
+import com.example.demo.models.TodoPutRequest;
+import com.example.demo.models.TodoRequest;
 import com.example.demo.repositories.TodoRepository;
 import com.example.demo.services.TodoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,9 +87,10 @@ public class TodoControllerTest {
 
     @Test
     public void givenNewTodo_whenAddTodo_thenTodoIsAddedToList() throws Exception {
-        Todo newTodo = new Todo(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", false);
+        TodoRequest newTodoRequest = new TodoRequest("Tarea de prueba 1", false);
+        Todo newTodo = new Todo(UUIDhelper.generateRandomUUID(), newTodoRequest.getText(), newTodoRequest.isFinished());
         String body = objectMapper.writeValueAsString(newTodo);
-        when(todoService.addTodo(newTodo)).thenReturn(newTodo);
+        when(todoService.addTodo(newTodoRequest)).thenReturn(newTodo);
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/todos")
                 .accept(MediaType.APPLICATION_JSON)
@@ -101,7 +104,7 @@ public class TodoControllerTest {
     }
 
     @Test
-    public void givenId_whenGetTodo_thenListTodo() throws Exception {
+    public void givenIdParam_whenGetTodo_thenListTodo() throws Exception {
         Todo todo = new Todo(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", false);
         String body = objectMapper.writeValueAsString(todo);
         when(todoService.getTodo(todo.getId())).thenReturn(todo);
@@ -117,10 +120,36 @@ public class TodoControllerTest {
     }
 
     @Test
+    public void givenIdParam_whenUpdateTodo_thenModifyIsFinished() throws Exception {
+        UUID id = UUIDhelper.generateRandomUUID();
+        Todo todo = new Todo(id, "Tarea de prueba 1", false);
+        String body = objectMapper.writeValueAsString(todo);
+        Todo updatedTodo = new Todo(todo.getId(), todo.getText(), !todo.isFinished());
+        String updatedBody = objectMapper.writeValueAsString(updatedTodo);
+
+        when(todoService.updateTodo(id)).thenReturn(updatedTodo);
+        RequestBuilder request = MockMvcRequestBuilders
+                .put("/todos/" + todo.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(body);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(updatedBody))
+                .andReturn();
+
+    }
+
+    /*
+    TESTING CASOS DE ERROR
+     */
+
+    @Test
     public void givenWrongFinishedValue_whenAddTodo_thenThrowMethodArgumentNotValidException() throws Exception {
-        Todo wrongTodo = new Todo("Tarea de prueba 1", true);
+        TodoRequest wrongTodoRequest = new TodoRequest("Tarea de prueba 1", true);
+        Todo wrongTodo = new Todo(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", true);
         String body = objectMapper.writeValueAsString(wrongTodo);
-        String errorMessage = "{\n" +
+        final String ERROR_MESSAGE = "{\n" +
                 "  \"errors\": [\n" +
                 "    {\n" +
                 "      \"error\": \"AssertFalse\",\n" +
@@ -130,7 +159,7 @@ public class TodoControllerTest {
                 "  ]\n" +
                 "}";
 
-        when(todoService.addTodo(wrongTodo)).thenReturn(wrongTodo);
+        when(todoService.addTodo(wrongTodoRequest)).thenReturn(wrongTodo);
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/todos")
                 .accept(MediaType.APPLICATION_JSON)
@@ -140,16 +169,17 @@ public class TodoControllerTest {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(errorMessage))
+                .andExpect(content().json(ERROR_MESSAGE))
                 .andReturn();
 
     }
 
     @Test
     public void givenWrongTextValue_whenAddTodo_thenThrowMethodArgumentNotValidException() throws Exception {
-        Todo wrongTodo = new Todo("", false);
-        String body = objectMapper.writeValueAsString(wrongTodo);
-        String errorMessage = "{\n" +
+        TodoRequest wrongTodoRequest = new TodoRequest("", false);
+        String body = objectMapper.writeValueAsString(wrongTodoRequest);
+        Todo wrongTodo = new Todo(UUIDhelper.generateRandomUUID(), wrongTodoRequest.getText(), wrongTodoRequest.isFinished());
+        final String ERROR_MESSAGE = "{\n" +
                 "  \"errors\": [\n" +
                 "    {\n" +
                 "      \"error\": \"NotBlank\",\n" +
@@ -159,7 +189,7 @@ public class TodoControllerTest {
                 "  ]\n" +
                 "}";
 
-        when(todoService.addTodo(wrongTodo)).thenReturn(wrongTodo);
+        when(todoService.addTodo(wrongTodoRequest)).thenReturn(wrongTodo);
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/todos")
                 .accept(MediaType.APPLICATION_JSON)
@@ -169,16 +199,17 @@ public class TodoControllerTest {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(errorMessage))
+                .andExpect(content().json(ERROR_MESSAGE))
                 .andReturn();
 
     }
 
     @Test
     public void givenWrongTextAndFinishedValues_whenAddTodo_thenThrowMethodArgumentNotValidException() throws Exception {
-        Todo wrongTodo = new Todo("", true);
+        TodoRequest wrongTodoRequest = new TodoRequest("", true);
+        Todo wrongTodo = new Todo(UUIDhelper.generateRandomUUID(), wrongTodoRequest.getText(), wrongTodoRequest.isFinished());
         String body = objectMapper.writeValueAsString(wrongTodo);
-        String errorMessage = "{\n" +
+        final String ERROR_MESSAGE = "{\n" +
                 "  \"errors\": [\n" +
                 "    {\n" +
                 "      \"error\": \"AssertFalse\",\n" +
@@ -193,7 +224,7 @@ public class TodoControllerTest {
                 "  ]\n" +
                 "}";
 
-        when(todoService.addTodo(wrongTodo)).thenReturn(wrongTodo);
+        when(todoService.addTodo(wrongTodoRequest)).thenReturn(wrongTodo);
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/todos")
                 .accept(MediaType.APPLICATION_JSON)
@@ -203,14 +234,14 @@ public class TodoControllerTest {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isBadRequest())
-                .andExpect(content().json(errorMessage))
+                .andExpect(content().json(ERROR_MESSAGE))
                 .andReturn();
     }
 
     @Test
-    public void givenWrongId_whenGetTodo_thenListTodo() throws Exception {
+    public void givenWrongIdParam_whenGetTodo_thenThrowNoSuchElementException() throws Exception {
         UUID id = UUIDhelper.generateRandomUUID();
-        String errorMessage = "{\n" +
+        final String ERROR_MESSAGE = "{\n" +
                 "  \"error\": \"Todo not found\"\n" +
                 "}";
         when(todoService.getTodo(id)).thenThrow(NoSuchElementException.class);
@@ -222,7 +253,30 @@ public class TodoControllerTest {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(content().json(errorMessage))
+                .andExpect(content().json(ERROR_MESSAGE))
+                .andReturn();
+
+    }
+
+    @Test
+    public void givenWrongIdParam_whenUpdateTodo_thenThrowNoSuchElementException() throws Exception {
+        TodoPutRequest todo = new TodoPutRequest("Tarea de prueba 1", false);
+        String body = "{\"text\": " + "\"todo.getText()\"" + ",\"finished\": " + !todo.isFinished() + "}";
+        final String ERROR_MESSAGE = "{\n" +
+                "  \"error\": \"Todo not found\"\n" +
+                "}";
+        UUID id = UUIDhelper.generateRandomUUID();
+        when(todoService.updateTodo(id)).thenThrow(NoSuchElementException.class);
+        RequestBuilder request = MockMvcRequestBuilders
+                .put("/todos/" + id)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8.name())
+                .content(body);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(content().json(ERROR_MESSAGE))
                 .andReturn();
 
     }

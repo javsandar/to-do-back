@@ -3,6 +3,7 @@ package com.example.demo.services;
 import com.example.demo.adapters.TodoAdapter;
 import com.example.demo.helpers.UUIDhelper;
 import com.example.demo.models.Todo;
+import com.example.demo.models.TodoRequest;
 import com.example.demo.repositories.TodoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -42,8 +43,8 @@ public class TodoService {
         return todoRepository.getTodos();
     }
 
-    public Todo addTodo(Todo todo) {
-        todo.setId(UUIDhelper.generateRandomUUID());
+    public Todo addTodo(TodoRequest todoRequest) {
+        Todo todo = new Todo(UUIDhelper.generateRandomUUID(), todoRequest.getText(), todoRequest.isFinished());
         return todoAdapter.add(todo);
     }
 
@@ -51,7 +52,7 @@ public class TodoService {
         return todoRepository.getTodos().stream().filter(t -> t.getId().equals(id)).findFirst().get();
     }
 
-    public Todo updateTodoBoolean(UUID id) {
+    public Todo updateTodo(UUID id) {
         return todoAdapter.update(id);
     }
 

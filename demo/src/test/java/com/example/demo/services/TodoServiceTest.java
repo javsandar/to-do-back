@@ -3,13 +3,12 @@ package com.example.demo.services;
 import com.example.demo.adapters.TodoAdapter;
 import com.example.demo.helpers.UUIDhelper;
 import com.example.demo.models.Todo;
+import com.example.demo.models.TodoRequest;
 import com.example.demo.repositories.TodoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -19,8 +18,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.BDDMockito.then;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -64,21 +62,35 @@ public class TodoServiceTest {
 
     @Test
     public void givenNewTodo_whenAddTodo_thenTodoIsAddedToList() {
-        Todo newTodo = new Todo("", false);
-        when(todoAdapter.add(newTodo)).thenReturn(newTodo);
-        Todo result = todoService.addTodo(newTodo);
-        then(todoAdapter).should(times(1)).add(newTodo);
-        assertEquals(result, newTodo);
+        TodoRequest newTodoRequest = new TodoRequest("Tarea de prueba 1", false);
+
+        todoService.addTodo(newTodoRequest);
+        ArgumentCaptor<Todo> todoCaptor = ArgumentCaptor.forClass(Todo.class);
+        verify(todoAdapter).add(todoCaptor.capture());
+
+        Todo newTodo = todoCaptor.getValue();
+        assertEquals(newTodo.getText(), newTodoRequest.getText());
+        assertEquals(newTodo.isFinished(), newTodoRequest.isFinished());
         assertNotNull(newTodo.getId());
+
     }
 
     @Test
-    public void givenId_whenGetTodo_thenListTodo() {
+    public void givenIdParam_whenGetTodo_thenListTodo() {
         Todo todoExpected = todos.get(0);
         UUID id = todoExpected.getId();
         when(todoRepository.getTodos()).thenReturn(todos);
         Todo result = todoService.getTodo(id);
         assertEquals(result, todoExpected);
+    }
+
+    @Test
+    public void givenIdParam_whenUpdateTodoBoolean_thenUpdateIsFinished() {
+        Todo todo = todos.get(0);
+        Todo expectedTodo = new Todo(todo.getId(), todo.getText(), !todo.isFinished());
+        Mockito.lenient().when(todoService.updateTodo(todo.getId())).thenReturn(expectedTodo);
+        Todo updatedTodo = todoService.updateTodo(todo.getId());
+        assertEquals(updatedTodo.isFinished(), expectedTodo.isFinished());
     }
 
 }
