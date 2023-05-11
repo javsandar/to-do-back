@@ -1,6 +1,6 @@
-package com.example.demo.exceptions;
+package com.example.demo.Controller.exceptions;
 
-import com.example.demo.errors.GeneratedError;
+import com.example.demo.Controller.errors.GeneratedError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

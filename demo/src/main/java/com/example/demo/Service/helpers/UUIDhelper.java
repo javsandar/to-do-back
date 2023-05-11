@@ -1,4 +1,4 @@
-package com.example.demo.helpers;
+package com.example.demo.Service.helpers;
 
 import java.util.UUID;
 

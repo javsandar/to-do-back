@@ -1,4 +1,4 @@
-package com.example.demo.errors;
+package com.example.demo.Controller.errors;
 
 public class GeneratedError {
 

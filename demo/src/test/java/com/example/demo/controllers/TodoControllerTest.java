@@ -1,11 +1,11 @@
 package com.example.demo.controllers;
 
-import com.example.demo.helpers.UUIDhelper;
-import com.example.demo.models.Todo;
-import com.example.demo.models.TodoPutRequest;
-import com.example.demo.models.TodoRequest;
-import com.example.demo.repositories.TodoRepository;
-import com.example.demo.services.TodoService;
+import com.example.demo.Service.helpers.UUIDhelper;
+import com.example.demo.Controller.models.Todo;
+import com.example.demo.Controller.models.TodoPutRequest;
+import com.example.demo.Controller.models.TodoRequest;
+import com.example.demo.Repository.repositories.TodoRepository;
+import com.example.demo.Service.service.TodoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

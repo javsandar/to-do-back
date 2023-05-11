@@ -1,4 +1,4 @@
-package com.example.demo.models;
+package com.example.demo.Controller.models;
 
 import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotBlank;

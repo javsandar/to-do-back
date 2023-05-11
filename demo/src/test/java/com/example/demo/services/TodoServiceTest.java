@@ -1,10 +1,10 @@
 package com.example.demo.services;
 
-import com.example.demo.adapters.TodoAdapter;
-import com.example.demo.helpers.UUIDhelper;
-import com.example.demo.models.Todo;
-import com.example.demo.models.TodoRequest;
-import com.example.demo.repositories.TodoRepository;
+import com.example.demo.Service.helpers.UUIDhelper;
+import com.example.demo.Service.service.TodoService;
+import com.example.demo.Controller.models.Todo;
+import com.example.demo.Controller.models.TodoRequest;
+import com.example.demo.Repository.repositories.TodoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
