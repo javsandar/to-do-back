@@ -1,7 +1,7 @@
 package com.example.demo.Controller.controllers;
 
-import com.example.demo.Controller.models.TodoPutRequest;
-import com.example.demo.Controller.models.TodoRequest;
+import com.example.demo.Controller.models.TodoUpdateRequestModel;
+import com.example.demo.Controller.models.TodoRequestModel;
 import com.example.demo.Repository.entities.TodoEntity;
 import com.example.demo.Service.service.TodoService;
 import jakarta.validation.Valid;
@@ -24,8 +24,8 @@ public class TodoController {
     }
 
     @PostMapping("/todos")
-    public TodoEntity addTodo(@RequestBody @Valid TodoRequest todoRequest) {
-        return todoService.addTodo(todoRequest);
+    public TodoEntity addTodo(@RequestBody @Valid TodoRequestModel todoRequestModel) {
+        return todoService.addTodo(todoRequestModel);
     }
 
     @GetMapping("/todos/{id}")
@@ -35,8 +35,8 @@ public class TodoController {
 
 
     @PutMapping("/todos/{id}")
-    public Optional<TodoEntity> updateTodo(@RequestBody @Valid TodoPutRequest todoRequest, @PathVariable UUID id) {
-        return Optional.ofNullable(todoService.updateTodo(id, todoRequest));
+    public Optional<TodoEntity> updateTodo(@RequestBody @Valid TodoUpdateRequestModel todoUpdateRequestModel, @PathVariable UUID id) {
+        return todoService.updateTodo(id, todoUpdateRequestModel);
     }
 
 }

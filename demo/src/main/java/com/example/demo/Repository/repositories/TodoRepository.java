@@ -10,8 +10,5 @@ import java.util.UUID;
 
 @Repository
 public interface TodoRepository extends JpaRepository<TodoEntity, UUID> {
-
-    default List<TodoEntity> findRemainingTodos() {
-        return findAll().stream().filter(todo -> !todo.isFinished()).toList();
-    }
+    List<TodoEntity> findByIsFinished(boolean finished);
 }
