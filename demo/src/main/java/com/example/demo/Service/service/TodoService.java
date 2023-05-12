@@ -16,5 +16,4 @@ public interface TodoService {
     Optional<TodoEntity> getTodo(UUID id);
     Optional<TodoEntity> updateTodo(UUID id, TodoUpdateRequestModel todoUpdateRequestModel);
 
-
 }

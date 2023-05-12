@@ -1,7 +1,7 @@
 package com.example.demo.Controller.controllers;
 
-import com.example.demo.Controller.models.TodoUpdateRequestModel;
 import com.example.demo.Controller.models.TodoRequestModel;
+import com.example.demo.Controller.models.TodoUpdateRequestModel;
 import com.example.demo.Repository.entities.TodoEntity;
 import com.example.demo.Service.service.TodoService;
 import jakarta.validation.Valid;
@@ -32,7 +32,6 @@ public class TodoController {
     public Optional<TodoEntity> getTodo(@PathVariable UUID id) {
         return todoService.getTodo(id);
     }
-
 
     @PutMapping("/todos/{id}")
     public Optional<TodoEntity> updateTodo(@RequestBody @Valid TodoUpdateRequestModel todoUpdateRequestModel, @PathVariable UUID id) {

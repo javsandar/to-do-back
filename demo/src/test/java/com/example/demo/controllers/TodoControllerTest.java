@@ -1,14 +1,16 @@
 package com.example.demo.controllers;
 
-import com.example.demo.Repository.entities.TodoEntity;
-import com.example.demo.Service.helpers.UUIDhelper;
-import com.example.demo.Controller.models.TodoUpdateRequestModel;
 import com.example.demo.Controller.models.TodoRequestModel;
+import com.example.demo.Repository.entities.TodoEntity;
 import com.example.demo.Repository.repositories.TodoRepository;
-import com.example.demo.Service.service.TodoServiceImpl;
+import com.example.demo.Service.helpers.UUIDhelper;
+import com.example.demo.Service.service.TodoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,9 +24,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -32,76 +36,77 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-@EnableWebMvc
 public class TodoControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext webApplicationContext;
     @MockBean
-    private TodoServiceImpl todoServiceImpl;
+    private TodoService todoService;
     @MockBean
     private TodoRepository todoRepository;
-    private List<TodoEntity> todos;
     @Autowired
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
     public void setup() throws Exception {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
-        todos = new ArrayList<>(Arrays.asList(
-                new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 0", false),
-                new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", false),
-                new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 2", true)));
     }
 
-    //Test de endpoints
-//    @Test
-//    public void givenNoParam_whenGetTodos_thenListAllTodos() throws Exception {
-//        when(todoServiceImpl.todosHandler(any())).thenReturn(todos);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .get("/todos")
-//                .contentType(MediaType.APPLICATION_JSON);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(content().json(objectMapper.writeValueAsString(todos)))
-//                .andReturn();
-//    }
-//
-//    @Test
-//    public void givenFinishedParam_whenGetTodos_thenListRemainingTodos() throws Exception {
-//        Boolean finished = false;
-//        List<TodoEntity> remainingTodos = todos.stream().filter(todo -> !todo.IsFinished()).toList();
-//        when(todoServiceImpl.todosHandler(finished)).thenReturn(remainingTodos);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .get("/todos")
-//                .queryParam("finished", "false")
-//                .contentType(MediaType.APPLICATION_JSON);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(content().json(objectMapper.writeValueAsString(remainingTodos)))
-//                .andReturn();
-//    }
-//
-//    @Test
-//    public void givenNewTodo_whenAddTodo_thenTodoIsAddedToList() throws Exception {
-//        TodoRequestModel newTodoRequestModel = new TodoRequestModel("Tarea de prueba 1", false);
-//        TodoEntity newTodo = new TodoEntity(UUIDhelper.generateRandomUUID(), newTodoRequestModel.getText(), newTodoRequestModel.isFinished());
-//        String body = objectMapper.writeValueAsString(newTodo);
-//        when(todoServiceImpl.addTodo(newTodoRequestModel)).thenReturn(newTodo);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .post("/todos")
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .characterEncoding(StandardCharsets.UTF_8.name())
-//                .content(body);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andReturn();
-//    }
+    @ParameterizedTest
+    @MethodSource("getTodosProvider")
+    public void _whenGetTodos_thenListTodos(Boolean isFinished, List<TodoEntity> todosProvided) throws Exception {
+        when(todoService.todosHandler(isFinished)).thenReturn(todosProvided);
+        todosProvided.forEach(System.out::println);
+        RequestBuilder request = MockMvcRequestBuilders
+                .get("/todos")
+                .queryParam("finished", isFinished != null ? isFinished.toString() : "")
+                .contentType(MediaType.APPLICATION_JSON);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(todosProvided)))
+                .andReturn();
+
+    }
+
+    private static Stream<Arguments> getTodosProvider() {
+        List<TodoEntity> allTodos = Arrays.asList(
+                new TodoEntity(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false),
+                new TodoEntity(UUID.fromString("39431462-9fbe-425f-96ba-e45f0bc67e71"), "Tarea de prueba 2", false),
+                new TodoEntity(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940c"), "Tarea de prueba 3", true)
+        );
+        List<TodoEntity> remainingTodos = Arrays.asList(
+                new TodoEntity(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false),
+                new TodoEntity(UUID.fromString("39431462-9fbe-425f-96ba-e45f0bc67e71"), "Tarea de prueba 2", false)
+        );
+
+        return Stream.of(
+                Arguments.of(null, allTodos),
+                Arguments.of(false, remainingTodos)
+        );
+
+    }
+
+    @Test
+    public void givenTodoRequestModel_whenAddTodo_thenTodoIsCreated() throws Exception {
+        TodoRequestModel newTodoRequestModel = new TodoRequestModel("Tarea de prueba 1", false);
+        String todoRequestModelBody = objectMapper.writeValueAsString(newTodoRequestModel);
+        TodoEntity newTodoEntity = new TodoEntity(UUIDhelper.generateRandomUUID(), newTodoRequestModel.getText(), newTodoRequestModel.isFinished());
+        when(todoService.addTodo(newTodoRequestModel)).thenReturn(newTodoEntity);
+        String expectedBody = objectMapper.writeValueAsString(todoRequestModelBody);
+        RequestBuilder request = MockMvcRequestBuilders
+                .post("/todos")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(todoRequestModelBody)
+                .characterEncoding(StandardCharsets.UTF_8);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(expectedBody))
+                .andReturn();
+    }
 //
 //    @Test
 //    public void givenIdParam_whenGetTodo_thenListTodo() throws Exception {
