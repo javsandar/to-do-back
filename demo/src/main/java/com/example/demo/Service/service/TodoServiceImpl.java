@@ -48,11 +48,11 @@ public class TodoServiceImpl implements TodoService {
     }
     @Override
     public Optional<TodoEntity> getTodo(UUID id) {
-        return todoRepository.findById(id);
+        return Optional.of(todoRepository.findById(id).orElseThrow());
     }
     @Override
     public Optional<TodoEntity> updateTodo(UUID id, TodoUpdateRequestModel todoUpdateRequestModel) {
-        TodoEntity updatedTodo = todoRepository.findById(id).get();
+        TodoEntity updatedTodo = todoRepository.findById(id).orElseThrow();
         updatedTodo.setText(todoUpdateRequestModel.getText());
         updatedTodo.setFinished(todoUpdateRequestModel.isFinished());
         return Optional.of(todoRepository.save(updatedTodo));

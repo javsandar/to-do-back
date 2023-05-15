@@ -1,17 +1,22 @@
 package com.example.demo.controllers;
 
+import com.example.demo.Controller.controllers.TodoController;
 import com.example.demo.Controller.models.TodoRequestModel;
+import com.example.demo.Controller.models.TodoUpdateRequestModel;
 import com.example.demo.Repository.entities.TodoEntity;
-import com.example.demo.Repository.repositories.TodoRepository;
 import com.example.demo.Service.helpers.UUIDhelper;
 import com.example.demo.Service.service.TodoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -20,32 +25,32 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(classes = {TodoController.class})
 @AutoConfigureMockMvc
+@EnableWebMvc
 public class TodoControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
     private WebApplicationContext webApplicationContext;
-    @MockBean
-    private TodoService todoService;
-    @MockBean
-    private TodoRepository todoRepository;
-    @Autowired
+    @Mock
+    TodoService todoService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @BeforeEach
@@ -56,8 +61,8 @@ public class TodoControllerTest {
     @ParameterizedTest
     @MethodSource("getTodosProvider")
     public void _whenGetTodos_thenListTodos(Boolean isFinished, List<TodoEntity> todosProvided) throws Exception {
-        when(todoService.todosHandler(isFinished)).thenReturn(todosProvided);
-        todosProvided.forEach(System.out::println);
+        given(todoService.todosHandler(isFinished)).willReturn(todosProvided);
+        String expectedBody = objectMapper.writeValueAsString(todosProvided);
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/todos")
                 .queryParam("finished", isFinished != null ? isFinished.toString() : "")
@@ -65,7 +70,7 @@ public class TodoControllerTest {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().json(objectMapper.writeValueAsString(todosProvided)))
+                .andExpect(content().json(expectedBody))
                 .andReturn();
 
     }
@@ -91,10 +96,10 @@ public class TodoControllerTest {
     @Test
     public void givenTodoRequestModel_whenAddTodo_thenTodoIsCreated() throws Exception {
         TodoRequestModel newTodoRequestModel = new TodoRequestModel("Tarea de prueba 1", false);
+        TodoEntity expectedTodoEntity = new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", false);
+
         String todoRequestModelBody = objectMapper.writeValueAsString(newTodoRequestModel);
-        TodoEntity newTodoEntity = new TodoEntity(UUIDhelper.generateRandomUUID(), newTodoRequestModel.getText(), newTodoRequestModel.isFinished());
-        when(todoService.addTodo(newTodoRequestModel)).thenReturn(newTodoEntity);
-        String expectedBody = objectMapper.writeValueAsString(todoRequestModelBody);
+        when(todoService.addTodo(any(TodoRequestModel.class))).thenReturn(expectedTodoEntity);
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/todos")
                 .accept(MediaType.APPLICATION_JSON)
@@ -104,164 +109,104 @@ public class TodoControllerTest {
         mockMvc.perform(request)
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(content().json(expectedBody))
+                .andExpect(jsonPath("$.id").value(expectedTodoEntity.getId().toString()))
+                .andExpect(jsonPath("$.text").value(expectedTodoEntity.getText()))
+                .andExpect(jsonPath("$.finished").value(expectedTodoEntity.isFinished()))
                 .andReturn();
     }
-//
-//    @Test
-//    public void givenIdParam_whenGetTodo_thenListTodo() throws Exception {
-//        TodoEntity todo = new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", false);
-//        String body = objectMapper.writeValueAsString(todo);
-//        when(todoServiceImpl.getTodo(todo.getId())).thenReturn(todo);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .get("/todos/" + todo.getId())
-//                .contentType(MediaType.APPLICATION_JSON);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(content().json(body))
-//                .andReturn();
-//
-//    }
-//
-//    @Test
-//    public void givenIdParam_whenUpdateTodo_thenModifyIsFinished() throws Exception {
-//        UUID id = UUIDhelper.generateRandomUUID();
-//        TodoEntity todo = new TodoEntity(id, "Tarea de prueba 1", false);
-//        String body = objectMapper.writeValueAsString(todo);
-//        TodoEntity updatedTodo = new TodoEntity(todo.getId(), todo.getText(), !todo.isFinished());
-//        String updatedBody = objectMapper.writeValueAsString(updatedTodo);
-//
-//        when(todoServiceImpl.updateTodo(id)).thenReturn(updatedTodo);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .put("/todos/" + todo.getId())
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(body);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isOk())
-//                .andExpect(content().json(updatedBody))
-//                .andReturn();
-//
-//    }
-//
+
+    @Test
+    public void givenIdParam_whenGetTodo_thenListTodo() throws Exception {
+        TodoEntity expectedTodoEntity = new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", false);
+        String body = objectMapper.writeValueAsString(expectedTodoEntity);
+        given(todoService.getTodo(expectedTodoEntity.getId())).willReturn(Optional.of(expectedTodoEntity));
+        RequestBuilder request = MockMvcRequestBuilders
+                .get("/todos/" + expectedTodoEntity.getId())
+                .contentType(MediaType.APPLICATION_JSON);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(body))
+                .andReturn();
+
+    }
+
+    @Test
+    public void givenIdParam_whenUpdateTodo_thenModifyIsFinished() throws Exception {
+        TodoEntity prevTodo = new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", false);
+
+        TodoUpdateRequestModel newTodoUpdateRequestModel = new TodoUpdateRequestModel(prevTodo.getText(), true);
+        String updateBody = objectMapper.writeValueAsString(newTodoUpdateRequestModel);
+
+        Optional<TodoEntity> expectedTodoEntity = Optional.of(new TodoEntity(prevTodo.getId(), newTodoUpdateRequestModel.getText(), newTodoUpdateRequestModel.isFinished()));
+
+        given(todoService.updateTodo(any(UUID.class), any(TodoUpdateRequestModel.class))).willReturn(expectedTodoEntity);
+
+        RequestBuilder request = MockMvcRequestBuilders
+                .put("/todos/" + prevTodo.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(updateBody)
+                .characterEncoding(StandardCharsets.UTF_8);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(expectedTodoEntity.get().getId().toString()))
+                .andExpect(jsonPath("$.text").value(expectedTodoEntity.get().getText()))
+                .andExpect(jsonPath("$.finished").value(expectedTodoEntity.get().isFinished()))
+                .andReturn();
+
+    }
+
 //    /*
 //    TESTING CASOS DE ERROR
 //     */
-//
-//    @Test
-//    public void givenWrongFinishedValue_whenAddTodo_thenThrowMethodArgumentNotValidException() throws Exception {
-//        TodoRequestModel wrongTodoRequestModel = new TodoRequestModel("Tarea de prueba 1", true);
-//        TodoEntity wrongTodo = new TodoEntity(UUIDhelper.generateRandomUUID(), "Tarea de prueba 1", true);
-//        String body = objectMapper.writeValueAsString(wrongTodo);
-//        final String ERROR_MESSAGE = "{\n" +
-//                "  \"errors\": [\n" +
-//                "    {\n" +
-//                "      \"error\": \"AssertFalse\",\n" +
-//                "      \"message\": \"Todo can not be finished\",\n" +
-//                "      \"detail\": \"Error located in 'isFinished' field\"\n" +
-//                "    }\n" +
-//                "  ]\n" +
-//                "}";
-//
-//        when(todoServiceImpl.addTodo(wrongTodoRequestModel)).thenReturn(wrongTodo);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .post("/todos")
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .characterEncoding(StandardCharsets.UTF_8.name())
-//                .content(body);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isBadRequest())
-//                .andExpect(content().json(ERROR_MESSAGE))
-//                .andReturn();
-//
-//    }
-//
-//    @Test
-//    public void givenWrongTextValue_whenAddTodo_thenThrowMethodArgumentNotValidException() throws Exception {
-//        TodoRequestModel wrongTodoRequestModel = new TodoRequestModel("", false);
-//        String body = objectMapper.writeValueAsString(wrongTodoRequestModel);
-//        TodoEntity wrongTodo = new TodoEntity(UUIDhelper.generateRandomUUID(), wrongTodoRequestModel.getText(), wrongTodoRequestModel.isFinished());
-//        final String ERROR_MESSAGE = "{\n" +
-//                "  \"errors\": [\n" +
-//                "    {\n" +
-//                "      \"error\": \"NotBlank\",\n" +
-//                "      \"message\": \"Todo description can not be empty\",\n" +
-//                "      \"detail\": \"Error located in 'text' field\"\n" +
-//                "    }\n" +
-//                "  ]\n" +
-//                "}";
-//
-//        when(todoServiceImpl.addTodo(wrongTodoRequestModel)).thenReturn(wrongTodo);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .post("/todos")
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .characterEncoding(StandardCharsets.UTF_8.name())
-//                .content(body);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isBadRequest())
-//                .andExpect(content().json(ERROR_MESSAGE))
-//                .andReturn();
-//
-//    }
-//
-//    @Test
-//    public void givenWrongTextAndFinishedValues_whenAddTodo_thenThrowMethodArgumentNotValidException() throws Exception {
-//        TodoRequestModel wrongTodoRequestModel = new TodoRequestModel("", true);
-//        Todo wrongTodo = new Todo(UUIDhelper.generateRandomUUID(), wrongTodoRequestModel.getText(), wrongTodoRequestModel.isFinished());
-//        String body = objectMapper.writeValueAsString(wrongTodo);
-//        final String ERROR_MESSAGE = "{\n" +
-//                "  \"errors\": [\n" +
-//                "    {\n" +
-//                "      \"error\": \"AssertFalse\",\n" +
-//                "      \"message\": \"Todo can not be finished\",\n" +
-//                "      \"detail\": \"Error located in 'isFinished' field\"\n" +
-//                "    },\n" +
-//                "    {\n" +
-//                "      \"error\": \"NotBlank\",\n" +
-//                "      \"message\": \"Todo description can not be empty\",\n" +
-//                "      \"detail\": \"Error located in 'text' field\"\n" +
-//                "    }\n" +
-//                "  ]\n" +
-//                "}";
-//
-//        when(todoServiceImpl.addTodo(wrongTodoRequestModel)).thenReturn(wrongTodo);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .post("/todos")
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .characterEncoding(StandardCharsets.UTF_8.name())
-//                .content(body);
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isBadRequest())
-//                .andExpect(content().json(ERROR_MESSAGE))
-//                .andReturn();
-//    }
-//
-//    @Test
-//    public void givenWrongIdParam_whenGetTodo_thenThrowNoSuchElementException() throws Exception {
-//        UUID id = UUIDhelper.generateRandomUUID();
-//        final String ERROR_MESSAGE = "{\n" +
-//                "  \"error\": \"Todo not found\"\n" +
-//                "}";
-//        when(todoServiceImpl.getTodo(id)).thenThrow(NoSuchElementException.class);
-//        RequestBuilder request = MockMvcRequestBuilders
-//                .get("/todos/" + id)
-//                .accept(MediaType.APPLICATION_JSON)
-//                .contentType(MediaType.APPLICATION_JSON_VALUE)
-//                .characterEncoding(StandardCharsets.UTF_8.name());
-//        mockMvc.perform(request)
-//                .andDo(print())
-//                .andExpect(status().isNotFound())
-//                .andExpect(content().json(ERROR_MESSAGE))
-//                .andReturn();
-//
-//    }
+
+    @ParameterizedTest
+    @MethodSource("provideFields")
+    public void givenWrongFinishedValue_whenAddTodo_thenThrowMethodArgumentNotValidException(String text, boolean isFinished) throws Exception {
+        TodoRequestModel wrongTodoRequestModel = new TodoRequestModel(text, isFinished);
+        String wrongTodoRequestModelBody = objectMapper.writeValueAsString(wrongTodoRequestModel);
+        RequestBuilder request = MockMvcRequestBuilders
+                .post("/todos")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .characterEncoding(StandardCharsets.UTF_8.name())
+                .content(wrongTodoRequestModelBody);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof MethodArgumentNotValidException))
+                .andReturn();
+    }
+
+    private static Stream<Arguments> provideFields() {
+        /* Se comprueban las 3 opciones:
+            - Texto incorrecto y finished correcto
+            - Texto correcto y finished incorrecto
+            - Ambos campos incorrectos
+        */
+        return Stream.of(
+                Arguments.of("", false),
+                Arguments.of("Tarea de prueba 1", true),
+                Arguments.of("", true)
+        );
+    }
+
+    @Test
+    public void givenWrongIdParam_whenGetTodo_thenThrowNoSuchElementException() throws Exception {
+        UUID invalidId = UUIDhelper.generateRandomUUID();
+        when(todoService.getTodo(invalidId)).thenThrow(NoSuchElementException.class);
+        RequestBuilder request = MockMvcRequestBuilders
+                .get("/todos/" + invalidId)
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON_VALUE);
+        mockMvc.perform(request)
+                .andDo(print())
+                .andExpect(status().isNotFound())
+//                .andExpect(result -> Assertions.assertTrue(result.getResolvedException() instanceof NoSuchElementException))
+                .andReturn();
+
+    }
 //
 //    @Test
 //    public void givenWrongIdParam_whenUpdateTodo_thenThrowNoSuchElementException() throws Exception {

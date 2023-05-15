@@ -32,7 +32,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             GeneratedError error = new GeneratedError();
             error.setError(fError.getCode());
             error.setMessage(fError.getDefaultMessage());
-            error.setDetail("Error located in " + "'" + fError.getField() + "'" + " field");
+            error.setDetail("Error located in " + "\"" + fError.getField() + "\"" + " field");
             errors.add(error);
         }
         errorsMap.put("errors", errors);

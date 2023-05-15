@@ -11,14 +11,15 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 
@@ -61,12 +62,10 @@ public class TodoServiceTest {
     @Test
     public void givenTodoRequestModel_whenAddTodo_thenTodoIsCreated() {
         TodoRequestModel todoRequestModel = new TodoRequestModel("Tarea de prueba 1", false);
-
-        ArgumentCaptor<TodoEntity> todoEntityCaptor = ArgumentCaptor.forClass(TodoEntity.class);
-        when(todoRepository.save(todoEntityCaptor.capture())).thenReturn(new TodoEntity());
+        TodoEntity capturedTodoEntity = new TodoEntity(UUIDhelper.generateRandomUUID(), todoRequestModel.getText(), todoRequestModel.isFinished());
+        when(todoRepository.save(any(TodoEntity.class))).thenReturn(capturedTodoEntity);
 
         todoService.addTodo(todoRequestModel);
-        TodoEntity capturedTodoEntity = todoEntityCaptor.getValue();
 
         Assertions.assertNotNull(capturedTodoEntity.getId());
         Assertions.assertEquals(capturedTodoEntity.getText(), todoRequestModel.getText());
@@ -93,13 +92,13 @@ public class TodoServiceTest {
         TodoEntity expectedTodo = new TodoEntity(prevTodo.getId(), todoUpdateRequestModel.getText(), todoUpdateRequestModel.isFinished());
 
         when(todoRepository.findById(prevTodo.getId())).thenReturn(Optional.of(prevTodo));
-        when(todoRepository.save(expectedTodo)).thenReturn(expectedTodo);
+        when(todoRepository.save(any(TodoEntity.class))).thenReturn(expectedTodo);
 
         Optional<TodoEntity> updatedTodo = Optional.of(todoService.updateTodo(prevTodo.getId(), todoUpdateRequestModel).get());
 
-        assertEquals(updatedTodo.get().getId(), expectedTodo.getId());
-        assertEquals(updatedTodo.get().getText(), expectedTodo.getText());
-        assertEquals(updatedTodo.get().isFinished(), expectedTodo.isFinished());
+        Assertions.assertEquals(updatedTodo.get().getId(), expectedTodo.getId());
+        Assertions.assertEquals(updatedTodo.get().getText(), expectedTodo.getText());
+        Assertions.assertEquals(updatedTodo.get().isFinished(), expectedTodo.isFinished());
     }
 
 }

@@ -54,19 +54,6 @@ public class TodoEntity {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TodoEntity that = (TodoEntity) o;
-        return isFinished == that.isFinished && Objects.equals(id, that.id) && Objects.equals(text, that.text);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, text, isFinished);
-    }
-
-    @Override
     public String toString() {
         return "TodoEntity{" +
                 "id=" + id +
