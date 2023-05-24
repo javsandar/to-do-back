@@ -5,7 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import java.util.Objects;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -19,14 +19,21 @@ public class TodoEntity {
     @Column(nullable = false)
     private boolean isFinished;
 
+    @Column(nullable = false)
+    private LocalDate creationDate;
+
+    @Column(nullable = false)
+    private LocalDate expireDate;
     public TodoEntity() {
 
     }
 
-    public TodoEntity(UUID id, String text, boolean isFinished) {
+    public TodoEntity(UUID id, String text, boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
         this.id = id;
         this.text = text;
         this.isFinished = isFinished;
+        this.creationDate = creationDate;
+        this.expireDate = expireDate;
     }
 
     public UUID getId() {
@@ -53,12 +60,30 @@ public class TodoEntity {
         isFinished = finished;
     }
 
+    public LocalDate getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(LocalDate creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public LocalDate getExpireDate() {
+        return expireDate;
+    }
+
+    public void setExpireDate(LocalDate expireDate) {
+        this.expireDate = expireDate;
+    }
+
     @Override
     public String toString() {
         return "TodoEntity{" +
                 "id=" + id +
                 ", text='" + text + '\'' +
                 ", isFinished=" + isFinished +
+                ", creationDate=" + creationDate +
+                ", expireDate=" + expireDate +
                 '}';
     }
 }

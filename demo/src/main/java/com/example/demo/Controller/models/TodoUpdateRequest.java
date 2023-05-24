@@ -1,23 +1,28 @@
 package com.example.demo.Controller.models;
 
-import jakarta.validation.constraints.AssertFalse;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public class TodoRequestModel {
+import java.time.LocalDate;
+
+public class TodoUpdateRequest {
+
     @NotBlank(message = "Todo description can not be empty")
     @Size(max = 20, message = "Todo text can not be greater than 20 characters")
     private String text;
-    @AssertFalse(message = "Todo can not be finished")
     private boolean isFinished;
 
-    public TodoRequestModel() {
+    private LocalDate expireDate;
+
+
+    public TodoUpdateRequest() {
 
     }
 
-    public TodoRequestModel(String text, boolean isFinished) {
+    public TodoUpdateRequest(String text, boolean isFinished, LocalDate expireDate) {
         this.text = text;
         this.isFinished = isFinished;
+        this.expireDate = expireDate;
     }
 
     public String getText() {
@@ -36,11 +41,12 @@ public class TodoRequestModel {
         isFinished = finished;
     }
 
-    @Override
-    public String toString() {
-        return "TodoRequestModel{" +
-                "text='" + text + '\'' +
-                ", isFinished=" + isFinished +
-                '}';
+    public LocalDate getExpireDate() {
+        return expireDate;
     }
+
+    public void setExpireDate(LocalDate expireDate) {
+        this.expireDate = expireDate;
+    }
+
 }
