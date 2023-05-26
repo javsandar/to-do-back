@@ -1,28 +1,11 @@
-package com.example.demo.Controller.models;
-
-import jakarta.validation.constraints.AssertFalse;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+package com.example.demo.Service.models;
 
 import java.time.LocalDate;
 
-public class TodoCreationRequest {
-    @NotBlank(message = "Todo description can not be empty")
-    @Size(max = 20, message = "Todo text can not be greater than 20 characters")
+public class TodoCreationDto {
     private String text;
-    @AssertFalse(message = "Todo can not be finished")
     private boolean isFinished;
     private LocalDate expireDate;
-
-    public TodoCreationRequest() {
-
-    }
-
-    public TodoCreationRequest(String text, boolean isFinished, LocalDate expireDate) {
-        this.text = text;
-        this.isFinished = isFinished;
-        this.expireDate = expireDate;
-    }
 
     public String getText() {
         return text;
@@ -50,7 +33,7 @@ public class TodoCreationRequest {
 
     @Override
     public String toString() {
-        return "TodoCreationRequest{" +
+        return "TodoCreationDto{" +
                 "text='" + text + '\'' +
                 ", isFinished=" + isFinished +
                 ", expireDate=" + expireDate +

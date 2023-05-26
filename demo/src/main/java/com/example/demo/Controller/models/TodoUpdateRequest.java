@@ -49,4 +49,12 @@ public class TodoUpdateRequest {
         this.expireDate = expireDate;
     }
 
+    @Override
+    public String toString() {
+        return "TodoUpdateRequest{" +
+                "text='" + text + '\'' +
+                ", isFinished=" + isFinished +
+                ", expireDate=" + expireDate +
+                '}';
+    }
 }

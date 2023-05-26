@@ -1,23 +1,23 @@
 package com.example.demo.Service.services;
 
-import com.example.demo.Controller.models.TodoFilter;
-import com.example.demo.Controller.models.TodoCreationRequest;
-import com.example.demo.Controller.models.TodoUpdateRequest;
-import com.example.demo.Repository.entities.TodoEntity;
+import com.example.demo.Service.models.TodoCreationDto;
+import com.example.demo.Service.models.TodoDto;
+import com.example.demo.Service.models.TodoFilterDto;
+import com.example.demo.Service.models.TodoUpdateDto;
 
 import java.util.List;
 import java.util.UUID;
 
 
 public interface TodoService {
-    List<TodoEntity> getTodosByFilter(TodoFilter filter);
+    List<TodoDto> getTodosByFilter(TodoFilterDto todoFilterDto);
 
-    List<TodoEntity> getAllTodos();
+    List<TodoDto> getAllTodos();
 
-    TodoEntity addTodo(TodoCreationRequest todoCreationRequest);
+    TodoDto addTodo(TodoCreationDto todoCreationDto);
 
-    TodoEntity getTodo(UUID id);
+    TodoDto getTodo(UUID id);
 
-    TodoEntity updateTodo(UUID id, TodoUpdateRequest todoUpdateRequest);
+    TodoDto updateTodo(UUID id, TodoUpdateDto todoUpdateDto);
 
 }

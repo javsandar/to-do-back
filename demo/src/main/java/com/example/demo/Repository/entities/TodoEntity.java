@@ -24,6 +24,7 @@ public class TodoEntity {
 
     @Column(nullable = false)
     private LocalDate expireDate;
+
     public TodoEntity() {
 
     }
@@ -78,12 +79,6 @@ public class TodoEntity {
 
     @Override
     public String toString() {
-        return "TodoEntity{" +
-                "id=" + id +
-                ", text='" + text + '\'' +
-                ", isFinished=" + isFinished +
-                ", creationDate=" + creationDate +
-                ", expireDate=" + expireDate +
-                '}';
+        return "TodoEntity{" + "id=" + id + ", text='" + text + '\'' + ", isFinished=" + isFinished + ", creationDate=" + creationDate + ", expireDate=" + expireDate + '}';
     }
 }

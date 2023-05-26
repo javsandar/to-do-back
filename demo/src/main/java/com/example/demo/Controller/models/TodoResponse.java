@@ -1,7 +1,6 @@
 package com.example.demo.Controller.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
 import java.util.UUID;
@@ -10,10 +9,11 @@ public class TodoResponse {
     private UUID id;
     private String text;
     private boolean isFinished;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate creationDate;
-
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate expireDate;
+
     public TodoResponse() {
 
     }

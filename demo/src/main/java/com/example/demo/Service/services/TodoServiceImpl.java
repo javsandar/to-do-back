@@ -1,11 +1,13 @@
 package com.example.demo.Service.services;
 
-import com.example.demo.Controller.models.TodoFilter;
-import com.example.demo.Controller.models.TodoCreationRequest;
-import com.example.demo.Controller.models.TodoUpdateRequest;
 import com.example.demo.Repository.entities.TodoEntity;
 import com.example.demo.Repository.repositories.TodoRepository;
 import com.example.demo.Service.helpers.UUIDhelper;
+import com.example.demo.Service.models.TodoCreationDto;
+import com.example.demo.Service.models.TodoDto;
+import com.example.demo.Service.models.TodoFilterDto;
+import com.example.demo.Service.models.TodoUpdateDto;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -18,43 +20,55 @@ import java.util.UUID;
 public class TodoServiceImpl implements TodoService {
     @Autowired
     private TodoRepository todoRepository;
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
-    public List<TodoEntity> getTodosByFilter(TodoFilter filter) {
-        if(filter.getFinished() == null && filter.getCreationDate() == null && filter.getExpireDate() == null){
+    public List<TodoDto> getTodosByFilter(TodoFilterDto filter) {
+        if (filter.getFinished() == null && filter.getCreationDate() == null && filter.getExpireDate() == null) {
             return getAllTodos();
         }
         TodoEntity exampleTodo = new TodoEntity(null, null, filter.getFinished(), filter.getCreationDate(), filter.getExpireDate());
         Example<TodoEntity> example = Example.of(exampleTodo);
-        return todoRepository.findAll(example);
+        List<TodoEntity> result = todoRepository.findAll(example);
+        List<TodoDto> resultDto = result.stream().map(element -> modelMapper.map(element, TodoDto.class)).toList();
+        return resultDto;
     }
 
     @Override
-    public List<TodoEntity> getAllTodos() {
-        return todoRepository.findAll();
+    public List<TodoDto> getAllTodos() {
+        List<TodoEntity> result = todoRepository.findAll();
+        List<TodoDto> resultDto = result.stream().map(element -> modelMapper.map(element, TodoDto.class)).toList();
+        return resultDto;
     }
 
     @Override
-    public TodoEntity addTodo(TodoCreationRequest todoCreationRequest) {
-        TodoEntity todoEntity = new TodoEntity(UUIDhelper.generateRandomUUID(), todoCreationRequest.getText(), todoCreationRequest.isFinished(), LocalDate.now(), todoCreationRequest.getExpireDate());
-        return todoRepository.save(todoEntity);
+    public TodoDto addTodo(TodoCreationDto todoCreationDto) {
+        TodoEntity todoEntity = modelMapper.map(todoCreationDto, TodoEntity.class);
+        todoEntity.setId(UUIDhelper.generateRandomUUID());
+        todoEntity.setCreationDate(LocalDate.now());
+        TodoDto resultDto = modelMapper.map(todoRepository.save(todoEntity), TodoDto.class);
+        return resultDto;
     }
 
     @Override
-    public TodoEntity getTodo(UUID id) {
-        return todoRepository.findById(id).orElse(null);
+    public TodoDto getTodo(UUID id) {
+        TodoEntity result = todoRepository.findById(id).orElse(null);
+        TodoDto resultDto = modelMapper.map(result, TodoDto.class);
+        return resultDto;
     }
 
     @Override
-    public TodoEntity updateTodo(UUID id, TodoUpdateRequest todoUpdateRequest) {
+    public TodoDto updateTodo(UUID id, TodoUpdateDto todoUpdateDto) {
         TodoEntity updatedTodo = todoRepository.findById(id).orElse(null);
         if (updatedTodo == null) {
             return null;
         }
-        updatedTodo.setText(todoUpdateRequest.getText());
-        updatedTodo.setFinished(todoUpdateRequest.isFinished());
-        updatedTodo.setExpireDate(todoUpdateRequest.getExpireDate());
-        return todoRepository.save(updatedTodo);
+        updatedTodo.setText(todoUpdateDto.getText());
+        updatedTodo.setFinished(todoUpdateDto.isFinished());
+        updatedTodo.setExpireDate(todoUpdateDto.getExpireDate());
+        TodoEntity result = todoRepository.save(updatedTodo);
+        TodoDto resultDto = modelMapper.map(result, TodoDto.class);
+        return resultDto;
     }
 
 }
