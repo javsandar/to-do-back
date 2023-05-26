@@ -7,6 +7,7 @@ import com.example.demo.Controller.models.TodoUpdateRequest;
 import com.example.demo.Service.helpers.UUIDhelper;
 import com.example.demo.Service.models.TodoCreationDto;
 import com.example.demo.Service.models.TodoDto;
+import com.example.demo.Service.models.TodoFilterDto;
 import com.example.demo.Service.models.TodoUpdateDto;
 import com.example.demo.Service.services.TodoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -75,8 +76,7 @@ public class TodoControllerTest {
     @ParameterizedTest
     @MethodSource("getTodosProvider")
     public void givenTodoFilter_whenGetTodos_thenReturnFilteredTodos(TodoFilter todoFilter, List<TodoDto> providedTodos, List<TodoResponse> expectedResponse) throws Exception {
-        when(todoService.getTodosByFilter(any())).thenReturn(providedTodos);
-        System.out.println(objectMapper.writeValueAsString(expectedResponse));
+        when(todoService.getTodosByFilter(any(TodoFilterDto.class))).thenReturn(providedTodos);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/todos")
@@ -180,9 +180,7 @@ public class TodoControllerTest {
         TodoUpdateRequest todoUpdateRequest = new TodoUpdateRequest("Tarea 1", true, LocalDate.of(2023, 5, 25));
         String requestBody = objectMapper.writeValueAsString(todoUpdateRequest);
         TodoDto todoDto = new TodoDto(id, todoUpdateRequest.getText(), todoUpdateRequest.isFinished(), LocalDate.of(2023, 5, 24), todoUpdateRequest.getExpireDate());
-
         TodoResponse expectedResponse = new TodoResponse(todoDto.getId(), todoDto.getText(), todoDto.isFinished(), todoDto.getCreationDate(), todoDto.getExpireDate());
-
         String expectedResponseBody = objectMapper.writeValueAsString(expectedResponse);
         when(todoService.updateTodo(eq(id), any(TodoUpdateDto.class))).thenReturn(todoDto);
 
@@ -239,6 +237,7 @@ public class TodoControllerTest {
     public void givenWrongIdParam_whenGetTodo_thenThrowResponseStatusException() throws Exception {
         UUID invalidId = UUIDhelper.generateRandomUUID();
         when(todoService.getTodo(invalidId)).thenReturn(null);
+
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/todos/" + invalidId)
                 .accept(MediaType.APPLICATION_JSON)
@@ -273,11 +272,12 @@ public class TodoControllerTest {
     @ParameterizedTest
     @MethodSource("provideFieldsForUpdate")
     public void givenWrongValues_whenUpdate_thenThrowMethodArgumentNotValidException(String text) throws Exception {
+        UUID id = UUIDhelper.generateRandomUUID();
         TodoUpdateRequest wrongTodoUpdateRequest = new TodoUpdateRequest(text, true, LocalDate.of(2023, 5, 25));
         String wrongRequestBody = objectMapper.writeValueAsString(wrongTodoUpdateRequest);
 
         RequestBuilder request = MockMvcRequestBuilders
-                .post("/todos")
+                .put("/todos/"+ id)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .characterEncoding(StandardCharsets.UTF_8.name())
@@ -295,7 +295,7 @@ public class TodoControllerTest {
             - Texto mayor de 20 caracteres
         */
         return Stream.of(
-                Arguments.of("", false),
+                Arguments.of(""),
                 Arguments.of("Tarea de prueba de error con más de 20 caracteres")
         );
     }

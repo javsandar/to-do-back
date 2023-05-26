@@ -24,6 +24,7 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public List<TodoDto> getTodosByFilter(TodoFilterDto filter) {
+        System.out.println(filter.toString());
         if (filter.getFinished() == null && filter.getCreationDate() == null && filter.getExpireDate() == null) {
             return getAllTodos();
         }

@@ -17,7 +17,7 @@ public class TodoEntity {
     @Column(nullable = false)
     private String text;
     @Column(nullable = false)
-    private boolean isFinished;
+    private Boolean isFinished;
 
     @Column(nullable = false)
     private LocalDate creationDate;
@@ -29,7 +29,7 @@ public class TodoEntity {
 
     }
 
-    public TodoEntity(UUID id, String text, boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
+    public TodoEntity(UUID id, String text, Boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
         this.id = id;
         this.text = text;
         this.isFinished = isFinished;

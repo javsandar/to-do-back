@@ -8,6 +8,15 @@ public class TodoUpdateDto {
 
     private LocalDate expireDate;
 
+    public TodoUpdateDto() {
+    }
+
+    public TodoUpdateDto(String text, boolean isFinished, LocalDate expireDate) {
+        this.text = text;
+        this.isFinished = isFinished;
+        this.expireDate = expireDate;
+    }
+
     public String getText() {
         return text;
     }
