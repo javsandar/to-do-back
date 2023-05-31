@@ -8,5 +8,6 @@ import java.util.UUID;
 
 
 @Repository
-public interface TodoRepository extends JpaRepository<TodoEntity, UUID> {
+public
+interface TodoRepository extends JpaRepository<TodoEntity, UUID>, TodoRepositoryCustom {
 }

@@ -1,16 +1,17 @@
 package com.example.demo.Service.services;
 
 import com.example.demo.Repository.entities.TodoEntity;
+import com.example.demo.Repository.models.TodoEntityFilter;
 import com.example.demo.Repository.repositories.TodoRepository;
-import com.example.demo.Service.helpers.UUIDhelper;
+import com.example.demo.Service.helpers.uuidHelper;
 import com.example.demo.Service.models.TodoCreationDto;
 import com.example.demo.Service.models.TodoDto;
 import com.example.demo.Service.models.TodoFilterDto;
 import com.example.demo.Service.models.TodoUpdateDto;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.Model;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,19 +25,8 @@ public class TodoServiceImpl implements TodoService {
 
     @Override
     public List<TodoDto> getTodosByFilter(TodoFilterDto filter) {
-        if (filter.getFinished() == null && filter.getCreationDate() == null && filter.getExpireDate() == null) {
-            return getAllTodos();
-        }
-        TodoEntity exampleTodo = new TodoEntity(null, null, filter.getFinished(), filter.getCreationDate(), filter.getExpireDate());
-        Example<TodoEntity> example = Example.of(exampleTodo);
-        List<TodoEntity> result = todoRepository.findAll(example);
-        List<TodoDto> resultDto = result.stream().map(element -> modelMapper.map(element, TodoDto.class)).toList();
-        return resultDto;
-    }
-
-    @Override
-    public List<TodoDto> getAllTodos() {
-        List<TodoEntity> result = todoRepository.findAll();
+        TodoEntityFilter todoEntityFilter = modelMapper.map(filter, TodoEntityFilter.class);
+        List<TodoEntity> result = todoRepository.findTodosByFilter(todoEntityFilter);
         List<TodoDto> resultDto = result.stream().map(element -> modelMapper.map(element, TodoDto.class)).toList();
         return resultDto;
     }
@@ -44,7 +34,7 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public TodoDto addTodo(TodoCreationDto todoCreationDto) {
         TodoEntity todoEntity = modelMapper.map(todoCreationDto, TodoEntity.class);
-        todoEntity.setId(UUIDhelper.generateRandomUUID());
+        todoEntity.setId(uuidHelper.generateRandomUUID());
         todoEntity.setCreationDate(LocalDate.now());
         TodoDto resultDto = modelMapper.map(todoRepository.save(todoEntity), TodoDto.class);
         return resultDto;

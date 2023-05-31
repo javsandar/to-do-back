@@ -4,7 +4,7 @@ import com.example.demo.Controller.models.TodoCreationRequest;
 import com.example.demo.Controller.models.TodoFilter;
 import com.example.demo.Controller.models.TodoResponse;
 import com.example.demo.Controller.models.TodoUpdateRequest;
-import com.example.demo.Service.helpers.UUIDhelper;
+import com.example.demo.Service.helpers.uuidHelper;
 import com.example.demo.Service.models.TodoCreationDto;
 import com.example.demo.Service.models.TodoDto;
 import com.example.demo.Service.models.TodoFilterDto;
@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,6 +37,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -94,9 +94,9 @@ public class TodoControllerTest {
 
     private static Stream<Arguments> getTodosProvider() {
         TodoFilter filterAllNull = new TodoFilter(null, null, null);
-        TodoFilter filterFinishedFalseAndExpireDateNull = new TodoFilter(false, null, LocalDate.parse("2023-05-24"));
-        TodoFilter filterFinishedNullAndExpireDate24 = new TodoFilter(null, null, LocalDate.parse("2023-05-24"));
-        TodoFilter filterFinishedNullAndExpireDate25 = new TodoFilter(null, null, LocalDate.parse("2023-05-25"));
+        TodoFilter filterFinishedFalseAndExpireDateNull = new TodoFilter(false, null, Collections.singletonList("2023-05-24"));
+        TodoFilter filterFinishedNullAndExpireDate24 = new TodoFilter(null, null, Collections.singletonList("2023-05-24"));
+        TodoFilter filterFinishedNullAndExpireDate25 = new TodoFilter(null, null, Collections.singletonList("2023-05-25"));
 
         List<TodoDto> caseAllNull = Arrays.asList(
                 new TodoDto(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
@@ -137,7 +137,7 @@ public class TodoControllerTest {
     public void givenTodoCreationRequest_whenAddTodo_thenTodoIsCreated() throws Exception {
         TodoCreationRequest todoCreationRequest = new TodoCreationRequest("Tarea 1", false, LocalDate.of(2023, 5, 25));
         String requestBody = objectMapper.writeValueAsString(todoCreationRequest);
-        TodoDto todoDto = new TodoDto(UUIDhelper.generateRandomUUID(), todoCreationRequest.getText(), todoCreationRequest.isFinished(), LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
+        TodoDto todoDto = new TodoDto(uuidHelper.generateRandomUUID(), todoCreationRequest.getText(), todoCreationRequest.isFinished(), LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
         TodoResponse expectedTodoResponse = new TodoResponse(todoDto.getId(), todoDto.getText(), todoDto.isFinished(), todoDto.getCreationDate(), todoDto.getExpireDate());
         String expectedTodoResponseBody = objectMapper.writeValueAsString(expectedTodoResponse);
         when(todoService.addTodo(any(TodoCreationDto.class))).thenReturn(todoDto);
@@ -157,7 +157,7 @@ public class TodoControllerTest {
 
     @Test
     public void givenIdParam_whenGetTodo_thenListTodo() throws Exception {
-        UUID id = UUIDhelper.generateRandomUUID();
+        UUID id = uuidHelper.generateRandomUUID();
         TodoDto todoDto = new TodoDto(id, "Tarea 1", false, LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
         when(todoService.getTodo(id)).thenReturn(todoDto);
         TodoResponse expectedTodoResponse = new TodoResponse(todoDto.getId(), todoDto.getText(), todoDto.isFinished(), todoDto.getCreationDate(), todoDto.getExpireDate());
@@ -176,7 +176,7 @@ public class TodoControllerTest {
     //
     @Test
     public void givenIdParam_whenUpdateTodo_thenModifyIsFinished() throws Exception {
-        UUID id = UUIDhelper.generateRandomUUID();
+        UUID id = uuidHelper.generateRandomUUID();
         TodoUpdateRequest todoUpdateRequest = new TodoUpdateRequest("Tarea 1", true, LocalDate.of(2023, 5, 25));
         String requestBody = objectMapper.writeValueAsString(todoUpdateRequest);
         TodoDto todoDto = new TodoDto(id, todoUpdateRequest.getText(), todoUpdateRequest.isFinished(), LocalDate.of(2023, 5, 24), todoUpdateRequest.getExpireDate());
@@ -235,7 +235,7 @@ public class TodoControllerTest {
 
     @Test
     public void givenWrongIdParam_whenGetTodo_thenThrowResponseStatusException() throws Exception {
-        UUID invalidId = UUIDhelper.generateRandomUUID();
+        UUID invalidId = uuidHelper.generateRandomUUID();
         when(todoService.getTodo(invalidId)).thenReturn(null);
 
         RequestBuilder request = MockMvcRequestBuilders
@@ -251,7 +251,7 @@ public class TodoControllerTest {
 
     @Test
     public void givenWrongIdParam_whenUpdateTodo_thenThrowResponseStatusException() throws Exception {
-        UUID invalidId = UUIDhelper.generateRandomUUID();
+        UUID invalidId = uuidHelper.generateRandomUUID();
         TodoUpdateRequest todoUpdateRequest = new TodoUpdateRequest("Tarea 1", true, LocalDate.of(2023, 5, 25));
         String requestBody = objectMapper.writeValueAsString(todoUpdateRequest);
         when(todoService.updateTodo(eq(invalidId), any(TodoUpdateDto.class))).thenReturn(null);
@@ -272,7 +272,7 @@ public class TodoControllerTest {
     @ParameterizedTest
     @MethodSource("provideFieldsForUpdate")
     public void givenWrongValues_whenUpdate_thenThrowMethodArgumentNotValidException(String text) throws Exception {
-        UUID id = UUIDhelper.generateRandomUUID();
+        UUID id = uuidHelper.generateRandomUUID();
         TodoUpdateRequest wrongTodoUpdateRequest = new TodoUpdateRequest(text, true, LocalDate.of(2023, 5, 25));
         String wrongRequestBody = objectMapper.writeValueAsString(wrongTodoUpdateRequest);
 

@@ -3,16 +3,17 @@ package com.example.demo.Controller.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class TodoFilter {
     private Boolean finished;
     private LocalDate creationDate;
-    private LocalDate expireDate;
+    private List<String> expireDate;
 
     public TodoFilter() {
     }
 
-    public TodoFilter(Boolean finished, LocalDate creationDate, LocalDate expireDate) {
+    public TodoFilter(Boolean finished, LocalDate creationDate, List<String> expireDate) {
         this.finished = finished;
         this.creationDate = creationDate;
         this.expireDate = expireDate;
@@ -34,11 +35,11 @@ public class TodoFilter {
         this.creationDate = creationDate;
     }
 
-    public LocalDate getExpireDate() {
+    public List<String> getExpireDate() {
         return expireDate;
     }
 
-    public void setExpireDate(LocalDate expireDate) {
+    public void setExpireDate(List<String> expireDate) {
         this.expireDate = expireDate;
     }
 

@@ -5,14 +5,13 @@ import com.example.demo.Service.models.TodoDto;
 import com.example.demo.Service.models.TodoFilterDto;
 import com.example.demo.Service.models.TodoUpdateDto;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 
 public interface TodoService {
     List<TodoDto> getTodosByFilter(TodoFilterDto todoFilterDto);
-
-    List<TodoDto> getAllTodos();
 
     TodoDto addTodo(TodoCreationDto todoCreationDto);
 

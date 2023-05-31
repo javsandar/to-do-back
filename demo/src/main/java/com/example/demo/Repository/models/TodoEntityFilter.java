@@ -1,18 +1,18 @@
-package com.example.demo.Service.models;
+package com.example.demo.Repository.models;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class TodoFilterDto {
+public class TodoEntityFilter {
+
     private Boolean finished;
     private LocalDate creationDate;
-
     private List<String> expireDate;
-    public TodoFilterDto(){
 
+    public TodoEntityFilter() {
     }
 
-    public TodoFilterDto(Boolean finished, LocalDate creationDate, List<String> expireDate) {
+    public TodoEntityFilter(Boolean finished, LocalDate creationDate, List<String> expireDate) {
         this.finished = finished;
         this.creationDate = creationDate;
         this.expireDate = expireDate;
@@ -44,7 +44,7 @@ public class TodoFilterDto {
 
     @Override
     public String toString() {
-        return "TodoFilterDto{" +
+        return "TodoEntityFilter{" +
                 "finished=" + finished +
                 ", creationDate=" + creationDate +
                 ", expireDate=" + expireDate +
