@@ -1,4 +1,4 @@
-package com.example.demo.controllers;
+package com.example.demo.Controller.controllers;
 
 import com.example.demo.Controller.models.TodoCreationRequest;
 import com.example.demo.Controller.models.TodoFilter;
@@ -74,7 +74,7 @@ public class TodoControllerTest {
     }
 
     @ParameterizedTest
-    @MethodSource("getTodosProvider")
+    @MethodSource("todosProvider")
     public void givenTodoFilter_whenGetTodos_thenReturnFilteredTodos(TodoFilter todoFilter, List<TodoDto> providedTodos, List<TodoResponse> expectedResponse) throws Exception {
         when(todoService.getTodosByFilter(any(TodoFilterDto.class))).thenReturn(providedTodos);
 
@@ -92,7 +92,7 @@ public class TodoControllerTest {
 
     }
 
-    private static Stream<Arguments> getTodosProvider() {
+    private static Stream<Arguments> todosProvider() {
         TodoFilter filterAllNull = new TodoFilter(null, null, null);
         TodoFilter filterFinishedFalseAndExpireDateNull = new TodoFilter(false, null, Collections.singletonList("2023-05-24"));
         TodoFilter filterFinishedNullAndExpireDate24 = new TodoFilter(null, null, Collections.singletonList("2023-05-24"));
@@ -123,6 +123,18 @@ public class TodoControllerTest {
                 new TodoResponse(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940c"), "Tarea de prueba 3", true, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")));
         List<TodoResponse> caseFinishedNullAndExpireDate25Response = List.of(
                 new TodoResponse(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940d"), "Tarea de prueba 4", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-25")));
+
+        /*
+            Faltaría comprobar los siguientes casos: (me da pereza)
+                -   caseFinishedFalseAndGteExpireDate24
+                -   caseFinishedFalseAndGtExpireDate24
+                -   caseFinishedFalseAndLteExpireDate26
+                -   caseFinishedFalseAndLtExpireDate26
+                -   caseFinishedFalseAndGteExpireDate24AndExpireDateLte26
+                -   caseFinishedFalseAndGteExpireDate24AndExpireDateLt26
+                -   caseFinishedFalseAndGtExpireDate24AndExpireDateLte26
+                -   caseFinishedFalseAndGtExpireDate24AndExpireDateLt26
+         */
 
         return Stream.of(
                 Arguments.of(filterAllNull, caseAllNull, caseAllNullResponse),
@@ -277,7 +289,7 @@ public class TodoControllerTest {
         String wrongRequestBody = objectMapper.writeValueAsString(wrongTodoUpdateRequest);
 
         RequestBuilder request = MockMvcRequestBuilders
-                .put("/todos/"+ id)
+                .put("/todos/" + id)
                 .accept(MediaType.APPLICATION_JSON)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .characterEncoding(StandardCharsets.UTF_8.name())
