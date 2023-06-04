@@ -43,6 +43,9 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public TodoDto getTodo(UUID id) {
         TodoEntity result = todoRepository.findById(id).orElse(null);
+        if (result == null){
+            return null;
+        }
         TodoDto resultDto = modelMapper.map(result, TodoDto.class);
         return resultDto;
     }

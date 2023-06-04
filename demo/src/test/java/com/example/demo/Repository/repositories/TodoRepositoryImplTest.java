@@ -40,12 +40,7 @@ public class TodoRepositoryImplTest {
     @MethodSource("predicatesProvider")
     public void givenTodoEntityFilter_whenFindTodosByFilter_thenReturnFilteredTodos(TodoEntityFilter filter, List<TodoEntity> expectedTodos) throws InstantiationException, IllegalAccessException {
         when(todoRepository.findTodosByFilter(any(TodoEntityFilter.class))).thenReturn(expectedTodos);
-        when(em.getCriteriaBuilder()).thenReturn(cb);
-        List<TodoEntity> result = todoRepository.findTodosByFilter(filter);
-        CriteriaBuilder cb = em.getCriteriaBuilder();
-        CriteriaQuery<TodoEntity> cq = cb.createQuery(TodoEntity.class);
 
-        result.forEach(System.out::println);
     }
 
     private static Stream<Arguments> predicatesProvider() {

@@ -18,11 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +37,8 @@ public class TodoServiceTest {
     private TodoService todoService = new TodoServiceImpl();
     @Mock
     private TodoRepository todoRepository;
+    @Autowired
+    private ModelMapper modelMapper = new ModelMapper();
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
@@ -43,12 +47,15 @@ public class TodoServiceTest {
     @ParameterizedTest
     @MethodSource("todosProvider")
     public void givenTodoFilterDto_whenGetTodosByFilter_thenReturnFilteredTodos(TodoFilterDto todoFilterDto, List<TodoEntity> providedTodos) {
-        List<TodoEntity> result;
+        List<TodoDto> result;
+        List<TodoDto> expected;
+
         TodoEntityFilter todoEntityFilter = new TodoEntityFilter(todoFilterDto.getFinished(), todoFilterDto.getCreationDate(), todoFilterDto.getExpireDate());
         when(todoRepository.findTodosByFilter(any(TodoEntityFilter.class))).thenReturn(providedTodos);
-        result = todoRepository.findTodosByFilter(todoEntityFilter);
-        result.forEach(System.out::println);
-        assert (result.containsAll(providedTodos));
+        result = todoService.getTodosByFilter(todoFilterDto);
+        expected = providedTodos.stream().map(todo -> modelMapper.map(todo, TodoDto.class)).collect(Collectors.toList());
+
+        assert (result.size() == expected.size());
     }
 
     private static Stream<Arguments> todosProvider() {
@@ -168,7 +175,7 @@ public class TodoServiceTest {
         TodoDto todoDto = new TodoDto(todoEntity.getId(), todoEntity.getText(), todoEntity.isFinished(), todoEntity.getCreationDate(), todoEntity.getExpireDate());
         when(todoRepository.save((any(TodoEntity.class)))).thenReturn(todoEntity);
 
-        TodoEntity result = todoRepository.save(todoEntity);
+        TodoDto result = todoService.addTodo(todoCreationDto);
         assert (result.getId() == todoEntity.getId());
         assert (result.getText().equals(todoEntity.getText()));
         assert (result.isFinished() == todoEntity.isFinished());
@@ -184,12 +191,12 @@ public class TodoServiceTest {
         TodoEntity todoEntity = new TodoEntity(id, "Tarea de prueba 1", false, LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
         when(todoRepository.findById(any(UUID.class))).thenReturn(Optional.of(todoEntity));
 
-        Optional<TodoEntity> result = todoRepository.findById(id);
-        assert (result.get().getId() == todoEntity.getId());
-        assert (result.get().getText().equals(todoEntity.getText()));
-        assert (result.get().isFinished() == todoEntity.isFinished());
-        assert (result.get().getCreationDate() == todoEntity.getCreationDate());
-        assert (result.get().getExpireDate() == todoEntity.getExpireDate());
+        TodoDto result = todoService.getTodo(id);
+        assert (result.getId() == todoEntity.getId());
+        assert (result.getText().equals(todoEntity.getText()));
+        assert (result.isFinished() == todoEntity.isFinished());
+        assert (result.getCreationDate() == todoEntity.getCreationDate());
+        assert (result.getExpireDate() == todoEntity.getExpireDate());
 
     }
 
@@ -200,9 +207,9 @@ public class TodoServiceTest {
         when(todoRepository.findById(any(UUID.class))).thenReturn(Optional.of(new TodoEntity(id, "Tarea de prueba 1", false, LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25))));
         Optional<TodoEntity> prevTodo = todoRepository.findById(id);
         TodoEntity updatedTodo = new TodoEntity(prevTodo.get().getId(), todoUpdateDto.getText(), todoUpdateDto.isFinished(), prevTodo.get().getCreationDate(), todoUpdateDto.getExpireDate());
-        when(todoRepository.save(updatedTodo)).thenReturn(updatedTodo);
+        when(todoRepository.save(any(TodoEntity.class))).thenReturn(updatedTodo);
 
-        TodoEntity result = todoRepository.save(updatedTodo);
+        TodoDto result = todoService.updateTodo(id, todoUpdateDto);
         assert (result.getId() == updatedTodo.getId());
         assert (result.getText().equals(updatedTodo.getText()));
         assert (result.isFinished() == updatedTodo.isFinished());
@@ -214,16 +221,15 @@ public class TodoServiceTest {
     @Test
     public void givenInvalidIdParam_whenGetTodo_thenReturnNull() {
         UUID invalidId = uuidHelper.generateRandomUUID();
-        when(todoRepository.findById(any(UUID.class))).thenReturn(null);
-        Optional<TodoEntity> result = todoRepository.findById(invalidId);
+        TodoDto result = todoService.getTodo(invalidId);
         assert (result == null);
     }
 
     @Test
     public void givenInvalidIdParam_whenUpdateTodo_thenReturnNull() {
         UUID invalidId = uuidHelper.generateRandomUUID();
-        when(todoRepository.findById(any(UUID.class))).thenReturn(null);
-        Optional<TodoEntity> result = todoRepository.findById(invalidId);
+        TodoUpdateDto todoUpdateDto = new TodoUpdateDto("Tarea actualizada", true, LocalDate.of(2023, 5, 26));
+        TodoDto result = todoService.updateTodo(invalidId, todoUpdateDto);
         assert (result == null);
     }
 
