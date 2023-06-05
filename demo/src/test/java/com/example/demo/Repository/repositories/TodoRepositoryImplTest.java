@@ -3,8 +3,9 @@ package com.example.demo.Repository.repositories;
 import com.example.demo.Repository.entities.TodoEntity;
 import com.example.demo.Repository.models.TodoEntityFilter;
 import jakarta.persistence.EntityManager;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -13,33 +14,39 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
 
 public class TodoRepositoryImplTest {
     @Mock
     private TodoRepositoryCustom todoRepository = new TodoRepositoryImpl();
     @Mock
-    private EntityManager em;
+    private EntityManager entityManager;
     @Mock
-    CriteriaBuilder cb;
-
+    private CriteriaQuery<TodoEntity> criteriaQuery;
+    @Mock
+    private Root<TodoEntity> todoEntityRoot;
+    @Mock
+    private CriteriaBuilder criteriaBuilder;
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
+
     }
 
 
     @ParameterizedTest
     @MethodSource("predicatesProvider")
     public void givenTodoEntityFilter_whenFindTodosByFilter_thenReturnFilteredTodos(TodoEntityFilter filter, List<TodoEntity> expectedTodos) throws InstantiationException, IllegalAccessException {
-        when(todoRepository.findTodosByFilter(any(TodoEntityFilter.class))).thenReturn(expectedTodos);
+        when(entityManager.getCriteriaBuilder()).thenReturn(criteriaBuilder);
+        when(criteriaBuilder.createQuery(TodoEntity.class)).thenReturn(criteriaQuery);
+        when(criteriaQuery.from(TodoEntity.class)).thenReturn(todoEntityRoot);
+
 
     }
 
