@@ -2,16 +2,16 @@ package com.example.demo.Service.models;
 
 import java.time.LocalDate;
 
-public class TodoUpdateDto {
+public class TodoUpdate {
     private String text;
     private boolean isFinished;
 
     private LocalDate expireDate;
 
-    public TodoUpdateDto() {
+    public TodoUpdate() {
     }
 
-    public TodoUpdateDto(String text, boolean isFinished, LocalDate expireDate) {
+    public TodoUpdate(String text, boolean isFinished, LocalDate expireDate) {
         this.text = text;
         this.isFinished = isFinished;
         this.expireDate = expireDate;

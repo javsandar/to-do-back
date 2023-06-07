@@ -1,14 +1,14 @@
 package com.example.demo.Controller.controllers;
 
 import com.example.demo.Controller.models.TodoCreationRequest;
-import com.example.demo.Controller.models.TodoFilter;
+import com.example.demo.Controller.models.TodoFilterRequest;
 import com.example.demo.Controller.models.TodoResponse;
 import com.example.demo.Controller.models.TodoUpdateRequest;
 import com.example.demo.Service.helpers.uuidHelper;
-import com.example.demo.Service.models.TodoCreationDto;
-import com.example.demo.Service.models.TodoDto;
-import com.example.demo.Service.models.TodoFilterDto;
-import com.example.demo.Service.models.TodoUpdateDto;
+import com.example.demo.Service.models.TodoCreation;
+import com.example.demo.Service.models.Todo;
+import com.example.demo.Service.models.TodoFilter;
+import com.example.demo.Service.models.TodoUpdate;
 import com.example.demo.Service.services.TodoService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -75,14 +75,14 @@ public class TodoControllerTest {
 
     @ParameterizedTest
     @MethodSource("todosProvider")
-    public void givenTodoFilter_whenGetTodos_thenReturnFilteredTodos(TodoFilter todoFilter, List<TodoDto> providedTodos, List<TodoResponse> expectedResponse) throws Exception {
-        when(todoService.getTodosByFilter(any(TodoFilterDto.class))).thenReturn(providedTodos);
+    public void givenTodoFilter_whenGetTodos_thenReturnFilteredTodos(TodoFilterRequest todoFilterRequest, List<Todo> providedTodos, List<TodoResponse> expectedResponse) throws Exception {
+        when(todoService.getTodosByFilter(any(TodoFilter.class))).thenReturn(providedTodos);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .get("/todos")
-                .param("finished", todoFilter.getFinished() != null ? todoFilter.getFinished().toString() : "")
-                .param("creationDate", todoFilter.getCreationDate() != null ? todoFilter.getCreationDate().toString() : "")
-                .param("expireDate", todoFilter.getExpireDate() != null ? todoFilter.getExpireDate().toString() : "")
+                .param("finished", todoFilterRequest.getFinished() != null ? todoFilterRequest.getFinished().toString() : "")
+                .param("creationDate", todoFilterRequest.getCreationDate() != null ? todoFilterRequest.getCreationDate().toString() : "")
+                .param("expireDate", todoFilterRequest.getExpireDate() != null ? todoFilterRequest.getExpireDate().toString() : "")
                 .contentType(MediaType.APPLICATION_JSON);
         MvcResult mvcResult = mockMvc.perform(request)
                 .andDo(print())
@@ -93,23 +93,23 @@ public class TodoControllerTest {
     }
 
     private static Stream<Arguments> todosProvider() {
-        TodoFilter filterAllNull = new TodoFilter(null, null, null);
-        TodoFilter filterFinishedFalseAndExpireDateNull = new TodoFilter(false, null, Collections.singletonList("2023-05-24"));
-        TodoFilter filterFinishedNullAndExpireDate24 = new TodoFilter(null, null, Collections.singletonList("2023-05-24"));
-        TodoFilter filterFinishedNullAndExpireDate25 = new TodoFilter(null, null, Collections.singletonList("2023-05-25"));
+        TodoFilterRequest filterAllNull = new TodoFilterRequest(null, null, null);
+        TodoFilterRequest filterFinishedFalseAndExpireDateNull = new TodoFilterRequest(false, null, Collections.singletonList("2023-05-24"));
+        TodoFilterRequest filterFinishedNullAndExpireDate24 = new TodoFilterRequest(null, null, Collections.singletonList("2023-05-24"));
+        TodoFilterRequest filterFinishedNullAndExpireDate25 = new TodoFilterRequest(null, null, Collections.singletonList("2023-05-25"));
 
-        List<TodoDto> caseAllNull = Arrays.asList(
-                new TodoDto(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
-                new TodoDto(UUID.fromString("39431462-9fbe-425f-96ba-e45f0bc67e71"), "Tarea de prueba 2", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
-                new TodoDto(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940c"), "Tarea de prueba 3", true, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
-                new TodoDto(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940d"), "Tarea de prueba 4", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-25")));
-        List<TodoDto> caseFinishedFalseAndExpireDateNull = Arrays.asList(
-                new TodoDto(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
-                new TodoDto(UUID.fromString("39431462-9fbe-425f-96ba-e45f0bc67e71"), "Tarea de prueba 2", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")));
-        List<TodoDto> caseFinishedTrueAndExpireDate24 = List.of(
-                new TodoDto(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940c"), "Tarea de prueba 3", true, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")));
-        List<TodoDto> caseFinishedNullAndExpireDate25 = List.of(
-                new TodoDto(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940d"), "Tarea de prueba 4", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-25")));
+        List<Todo> caseAllNull = Arrays.asList(
+                new Todo(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
+                new Todo(UUID.fromString("39431462-9fbe-425f-96ba-e45f0bc67e71"), "Tarea de prueba 2", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
+                new Todo(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940c"), "Tarea de prueba 3", true, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
+                new Todo(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940d"), "Tarea de prueba 4", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-25")));
+        List<Todo> caseFinishedFalseAndExpireDateNull = Arrays.asList(
+                new Todo(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
+                new Todo(UUID.fromString("39431462-9fbe-425f-96ba-e45f0bc67e71"), "Tarea de prueba 2", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")));
+        List<Todo> caseFinishedTrueAndExpireDate24 = List.of(
+                new Todo(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940c"), "Tarea de prueba 3", true, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")));
+        List<Todo> caseFinishedNullAndExpireDate25 = List.of(
+                new Todo(UUID.fromString("4fb21f20-28d9-4af1-a20c-ab364ba4940d"), "Tarea de prueba 4", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-25")));
 
         List<TodoResponse> caseAllNullResponse = Arrays.asList(
                 new TodoResponse(UUID.fromString("72836dd4-ec1a-4ff6-98f3-55bfeb2728d5"), "Tarea de prueba 1", false, LocalDate.parse("2023-05-24"), LocalDate.parse("2023-05-24")),
@@ -149,10 +149,10 @@ public class TodoControllerTest {
     public void givenTodoCreationRequest_whenAddTodo_thenTodoIsCreated() throws Exception {
         TodoCreationRequest todoCreationRequest = new TodoCreationRequest("Tarea 1", false, LocalDate.of(2023, 5, 25));
         String requestBody = objectMapper.writeValueAsString(todoCreationRequest);
-        TodoDto todoDto = new TodoDto(uuidHelper.generateRandomUUID(), todoCreationRequest.getText(), todoCreationRequest.isFinished(), LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
-        TodoResponse expectedTodoResponse = new TodoResponse(todoDto.getId(), todoDto.getText(), todoDto.isFinished(), todoDto.getCreationDate(), todoDto.getExpireDate());
+        Todo todo = new Todo(uuidHelper.generateRandomUUID(), todoCreationRequest.getText(), todoCreationRequest.isFinished(), LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
+        TodoResponse expectedTodoResponse = new TodoResponse(todo.getId(), todo.getText(), todo.isFinished(), todo.getCreationDate(), todo.getExpireDate());
         String expectedTodoResponseBody = objectMapper.writeValueAsString(expectedTodoResponse);
-        when(todoService.addTodo(any(TodoCreationDto.class))).thenReturn(todoDto);
+        when(todoService.addTodo(any(TodoCreation.class))).thenReturn(todo);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .post("/todos")
@@ -170,9 +170,9 @@ public class TodoControllerTest {
     @Test
     public void givenIdParam_whenGetTodo_thenListTodo() throws Exception {
         UUID id = uuidHelper.generateRandomUUID();
-        TodoDto todoDto = new TodoDto(id, "Tarea 1", false, LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
-        when(todoService.getTodo(id)).thenReturn(todoDto);
-        TodoResponse expectedTodoResponse = new TodoResponse(todoDto.getId(), todoDto.getText(), todoDto.isFinished(), todoDto.getCreationDate(), todoDto.getExpireDate());
+        Todo todo = new Todo(id, "Tarea 1", false, LocalDate.of(2023, 5, 24), LocalDate.of(2023, 5, 25));
+        when(todoService.getTodo(id)).thenReturn(todo);
+        TodoResponse expectedTodoResponse = new TodoResponse(todo.getId(), todo.getText(), todo.isFinished(), todo.getCreationDate(), todo.getExpireDate());
         String expectedTodoResponseBody = objectMapper.writeValueAsString(expectedTodoResponse);
 
         RequestBuilder request = MockMvcRequestBuilders
@@ -191,10 +191,10 @@ public class TodoControllerTest {
         UUID id = uuidHelper.generateRandomUUID();
         TodoUpdateRequest todoUpdateRequest = new TodoUpdateRequest("Tarea 1", true, LocalDate.of(2023, 5, 25));
         String requestBody = objectMapper.writeValueAsString(todoUpdateRequest);
-        TodoDto todoDto = new TodoDto(id, todoUpdateRequest.getText(), todoUpdateRequest.isFinished(), LocalDate.of(2023, 5, 24), todoUpdateRequest.getExpireDate());
-        TodoResponse expectedResponse = new TodoResponse(todoDto.getId(), todoDto.getText(), todoDto.isFinished(), todoDto.getCreationDate(), todoDto.getExpireDate());
+        Todo todo = new Todo(id, todoUpdateRequest.getText(), todoUpdateRequest.isFinished(), LocalDate.of(2023, 5, 24), todoUpdateRequest.getExpireDate());
+        TodoResponse expectedResponse = new TodoResponse(todo.getId(), todo.getText(), todo.isFinished(), todo.getCreationDate(), todo.getExpireDate());
         String expectedResponseBody = objectMapper.writeValueAsString(expectedResponse);
-        when(todoService.updateTodo(eq(id), any(TodoUpdateDto.class))).thenReturn(todoDto);
+        when(todoService.updateTodo(eq(id), any(TodoUpdate.class))).thenReturn(todo);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put("/todos/" + id)
@@ -266,7 +266,7 @@ public class TodoControllerTest {
         UUID invalidId = uuidHelper.generateRandomUUID();
         TodoUpdateRequest todoUpdateRequest = new TodoUpdateRequest("Tarea 1", true, LocalDate.of(2023, 5, 25));
         String requestBody = objectMapper.writeValueAsString(todoUpdateRequest);
-        when(todoService.updateTodo(eq(invalidId), any(TodoUpdateDto.class))).thenReturn(null);
+        when(todoService.updateTodo(eq(invalidId), any(TodoUpdate.class))).thenReturn(null);
 
         RequestBuilder request = MockMvcRequestBuilders
                 .put("/todos/" + invalidId)

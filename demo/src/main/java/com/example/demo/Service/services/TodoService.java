@@ -1,22 +1,22 @@
 package com.example.demo.Service.services;
 
-import com.example.demo.Service.models.TodoCreationDto;
-import com.example.demo.Service.models.TodoDto;
-import com.example.demo.Service.models.TodoFilterDto;
-import com.example.demo.Service.models.TodoUpdateDto;
+import com.example.demo.Service.models.TodoCreation;
+import com.example.demo.Service.models.Todo;
+import com.example.demo.Service.models.TodoFilter;
+import com.example.demo.Service.models.TodoUpdate;
+import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-
+@Service
 public interface TodoService {
-    List<TodoDto> getTodosByFilter(TodoFilterDto todoFilterDto);
+    List<Todo> getTodosByFilter(TodoFilter todoFilter);
 
-    TodoDto addTodo(TodoCreationDto todoCreationDto);
+    Todo addTodo(TodoCreation todoCreation);
 
-    TodoDto getTodo(UUID id);
+    Todo getTodo(UUID id);
 
-    TodoDto updateTodo(UUID id, TodoUpdateDto todoUpdateDto);
+    Todo updateTodo(UUID id, TodoUpdate todoUpdate);
 
 }

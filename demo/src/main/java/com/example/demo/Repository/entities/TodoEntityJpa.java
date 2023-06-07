@@ -1,24 +1,35 @@
-package com.example.demo.Service.models;
+package com.example.demo.Repository.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
-public class TodoDto {
+@Entity
+@Table(name = "Todo")
+public class TodoEntityJpa {
+    @Id
+    @Column(nullable = false)
     private UUID id;
+    @Column(nullable = false)
     private String text;
+    @Column(nullable = false)
     private boolean isFinished;
+
+    @Column(nullable = false)
     private LocalDate creationDate;
+
+    @Column(nullable = false)
     private LocalDate expireDate;
 
-    public TodoDto() {
+    public TodoEntityJpa() {
 
     }
 
-    public TodoDto(UUID id, String text, boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
+    public TodoEntityJpa(UUID id, String text, Boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
         this.id = id;
         this.text = text;
         this.isFinished = isFinished;
@@ -68,12 +79,6 @@ public class TodoDto {
 
     @Override
     public String toString() {
-        return "TodoDto{" +
-                "id=" + id +
-                ", text='" + text + '\'' +
-                ", isFinished=" + isFinished +
-                ", creationDate=" + creationDate +
-                ", expireDate=" + expireDate +
-                '}';
+        return "TodoEntity{" + "id=" + id + ", text='" + text + '\'' + ", isFinished=" + isFinished + ", creationDate=" + creationDate + ", expireDate=" + expireDate + '}';
     }
 }

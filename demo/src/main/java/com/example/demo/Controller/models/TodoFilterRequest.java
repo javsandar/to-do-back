@@ -1,19 +1,17 @@
 package com.example.demo.Controller.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDate;
 import java.util.List;
 
-public class TodoFilter {
+public class TodoFilterRequest {
     private Boolean finished;
     private LocalDate creationDate;
     private List<String> expireDate;
 
-    public TodoFilter() {
+    public TodoFilterRequest() {
     }
 
-    public TodoFilter(Boolean finished, LocalDate creationDate, List<String> expireDate) {
+    public TodoFilterRequest(Boolean finished, LocalDate creationDate, List<String> expireDate) {
         this.finished = finished;
         this.creationDate = creationDate;
         this.expireDate = expireDate;

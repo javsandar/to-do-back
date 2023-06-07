@@ -1,13 +1,13 @@
 package com.example.demo.Controller.controllers;
 
 import com.example.demo.Controller.models.TodoCreationRequest;
-import com.example.demo.Controller.models.TodoFilter;
+import com.example.demo.Controller.models.TodoFilterRequest;
 import com.example.demo.Controller.models.TodoResponse;
 import com.example.demo.Controller.models.TodoUpdateRequest;
-import com.example.demo.Service.models.TodoCreationDto;
-import com.example.demo.Service.models.TodoDto;
-import com.example.demo.Service.models.TodoFilterDto;
-import com.example.demo.Service.models.TodoUpdateDto;
+import com.example.demo.Service.models.TodoCreation;
+import com.example.demo.Service.models.Todo;
+import com.example.demo.Service.models.TodoFilter;
+import com.example.demo.Service.models.TodoUpdate;
 import com.example.demo.Service.services.TodoService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
@@ -30,23 +30,23 @@ public class TodoController {
     private final ModelMapper modelMapper = new ModelMapper();
 
     @GetMapping("/todos")
-    public ResponseEntity<List<TodoResponse>> getTodos(@ModelAttribute("TodoFilter") TodoFilter filter) {
-        TodoFilterDto todoFilterDto = modelMapper.map(filter, TodoFilterDto.class);
-        List<TodoDto> responseDto = todoService.getTodosByFilter(todoFilterDto);
+    public ResponseEntity<List<TodoResponse>> getTodos(@ModelAttribute("TodoFilter") TodoFilterRequest filter) {
+        TodoFilter todoFilter = modelMapper.map(filter, TodoFilter.class);
+        List<Todo> responseDto = todoService.getTodosByFilter(todoFilter);
         List<TodoResponse> response = responseDto.stream().map(element -> modelMapper.map(element, TodoResponse.class)).collect(Collectors.toList());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping("/todos")
     public ResponseEntity<TodoResponse> addTodo(@RequestBody @Valid TodoCreationRequest todoCreationRequest) {
-        TodoCreationDto todoCreationDto = modelMapper.map(todoCreationRequest, TodoCreationDto.class);
-        TodoResponse response = modelMapper.map(todoService.addTodo(todoCreationDto), TodoResponse.class);
+        TodoCreation todoCreation = modelMapper.map(todoCreationRequest, TodoCreation.class);
+        TodoResponse response = modelMapper.map(todoService.addTodo(todoCreation), TodoResponse.class);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @GetMapping("/todos/{id}")
     public ResponseEntity<TodoResponse> getTodo(@PathVariable UUID id) {
-        TodoDto responseDto = todoService.getTodo(id);
+        Todo responseDto = todoService.getTodo(id);
         if (responseDto == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Todo not found");
         }
@@ -56,8 +56,8 @@ public class TodoController {
 
     @PutMapping("/todos/{id}")
     public ResponseEntity<TodoResponse> updateTodo(@RequestBody @Valid TodoUpdateRequest todoUpdateRequest, @PathVariable UUID id) {
-        TodoUpdateDto todoUpdateDto = modelMapper.map(todoUpdateRequest, TodoUpdateDto.class);
-        TodoDto responseDto = todoService.updateTodo(id, todoUpdateDto);
+        TodoUpdate todoUpdate = modelMapper.map(todoUpdateRequest, TodoUpdate.class);
+        Todo responseDto = todoService.updateTodo(id, todoUpdate);
         if (responseDto == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Todo not found");
         }

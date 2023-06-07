@@ -1,35 +1,30 @@
 package com.example.demo.Repository.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
-@Entity
-@Table(name = "Todo")
-public class TodoEntity {
+@Document("todos")
+public class TodoEntityMongo {
     @Id
-    @Column(nullable = false)
     private UUID id;
-    @Column(nullable = false)
+    @Field("text")
     private String text;
-    @Column(nullable = false)
-    private Boolean isFinished;
-
-    @Column(nullable = false)
+    @Field("isFinished")
+    private boolean isFinished;
+    @Field("creationDate")
     private LocalDate creationDate;
-
-    @Column(nullable = false)
+    @Field("expireDate")
     private LocalDate expireDate;
 
-    public TodoEntity() {
+    public TodoEntityMongo() {
 
     }
 
-    public TodoEntity(UUID id, String text, Boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
+    public TodoEntityMongo(UUID id, String text, Boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
         this.id = id;
         this.text = text;
         this.isFinished = isFinished;
@@ -79,6 +74,6 @@ public class TodoEntity {
 
     @Override
     public String toString() {
-        return "TodoEntity{" + "id=" + id + ", text='" + text + '\'' + ", isFinished=" + isFinished + ", creationDate=" + creationDate + ", expireDate=" + expireDate + '}';
+        return "TodoEntityMongo{" + "id=" + id + ", text='" + text + '\'' + ", isFinished=" + isFinished + ", creationDate=" + creationDate + ", expireDate=" + expireDate + '}';
     }
 }

@@ -3,16 +3,16 @@ package com.example.demo.Service.models;
 import java.time.LocalDate;
 import java.util.List;
 
-public class TodoFilterDto {
+public class TodoFilter {
     private Boolean finished;
     private LocalDate creationDate;
 
     private List<String> expireDate;
-    public TodoFilterDto(){
+    public TodoFilter(){
 
     }
 
-    public TodoFilterDto(Boolean finished, LocalDate creationDate, List<String> expireDate) {
+    public TodoFilter(Boolean finished, LocalDate creationDate, List<String> expireDate) {
         this.finished = finished;
         this.creationDate = creationDate;
         this.expireDate = expireDate;
