@@ -6,17 +6,20 @@ import com.example.demo.Service.models.Todo;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Array;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
-@Primary
-@Component
+@Profile("MongoDB")
+@Component("todoRepositoryMongoAdapter")
 public class TodoRepositoryMongoAdapter implements TodoRepository {
     @Autowired
     private TodoRepositoryMongo todoRepositoryMongo;
@@ -24,12 +27,11 @@ public class TodoRepositoryMongoAdapter implements TodoRepository {
     private MongoTemplate mongoTemplate;
     private final ModelMapper modelMapper = new ModelMapper();
 
-
     @Override
     public List<Todo> findTodosByFilter(TodoEntityFilter todoEntityFilter) {
-        Query query = new Query();
         ArrayList<List<Criteria>> criteriaList = getCriterias(todoEntityFilter);
-        List<TodoEntityMongo> queryList = mongoTemplate.find(buildQuery(query, criteriaList), TodoEntityMongo.class);
+        Query query = buildQuery(new Query(), criteriaList);
+        List<TodoEntityMongo> queryList = mongoTemplate.find(query, TodoEntityMongo.class);
         List<Todo> result = queryList.stream().map(element -> modelMapper.map(element, Todo.class)).toList();
         return result;
     }
@@ -78,9 +80,10 @@ public class TodoRepositoryMongoAdapter implements TodoRepository {
                         andCriterias.add(Criteria.where("expireDate").lt(expireDate));
                     }
                 }
-                if (andCriterias.size() == 2){
+                if (andCriterias.size() == 2) {
                     c.andOperator(andCriterias.get(0), andCriterias.get(1));
-                } else {
+                }
+                if (andCriterias.size() == 1) {
                     c.andOperator(andCriterias.get(0));
                 }
                 expireDateCriterias.add(c);

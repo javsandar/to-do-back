@@ -103,6 +103,7 @@
         </dependency>
 
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -110,6 +111,28 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
     </build>
+
+    <profiles>
+        <profile>
+            <id>MongoDB</id>
+            <properties>
+                <spring.profiles.active>MongoDB</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>H2</id>
+            <properties>
+                <spring.profiles.active>H2</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
+
 
 </project>

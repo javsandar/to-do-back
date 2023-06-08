@@ -11,6 +11,7 @@ import jakarta.persistence.criteria.Root;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -19,8 +20,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//@Primary
-@Component
+@Profile("H2")
+@Component("todoRepositoryJpaAdapter")
 public class TodoRepositoryJpaAdapter implements TodoRepository {
     @Autowired
     private TodoRepositoryJpa todoRepositoryJpa;
