@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
-@Table(name = "Todo")
+@Table(name = "todo")
 public class TodoEntityJpa {
     @Id
     @Column(nullable = false)
