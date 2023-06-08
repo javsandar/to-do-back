@@ -26,7 +26,7 @@ public class TodoRepositoryJpaAdapter implements TodoRepository {
     private TodoRepositoryJpa todoRepositoryJpa;
     @Autowired
     private EntityManager em;
-    private ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper = new ModelMapper();
 
     @Override
     public List<Todo> findTodosByFilter(TodoEntityFilter todoEntityFilter) {

@@ -1,7 +1,7 @@
 package com.example.demo.Service.services;
 
-import com.example.demo.Service.models.TodoCreation;
 import com.example.demo.Service.models.Todo;
+import com.example.demo.Service.models.TodoCreation;
 import com.example.demo.Service.models.TodoFilter;
 import com.example.demo.Service.models.TodoUpdate;
 import org.springframework.stereotype.Service;

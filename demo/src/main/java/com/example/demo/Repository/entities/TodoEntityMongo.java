@@ -13,7 +13,7 @@ public class TodoEntityMongo {
     private UUID id;
     @Field("text")
     private String text;
-    @Field("isFinished")
+    @Field("finished")
     private boolean isFinished;
     @Field("creationDate")
     private LocalDate creationDate;
@@ -24,7 +24,7 @@ public class TodoEntityMongo {
 
     }
 
-    public TodoEntityMongo(UUID id, String text, Boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
+    public TodoEntityMongo(UUID id, String text, boolean isFinished, LocalDate creationDate, LocalDate expireDate) {
         this.id = id;
         this.text = text;
         this.isFinished = isFinished;
