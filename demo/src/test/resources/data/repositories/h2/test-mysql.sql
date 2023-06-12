@@ -7,7 +7,7 @@ CREATE TABLE todo (
     TEXT VARCHAR(20)
 );
 
-INSERT INTO todo VALUES ('af690230-84f3-45ea-a960-fc3d4bc99f65','2023-06-08','2023-06-01', false, 'Tarea de prueba 1');
+INSERT INTO todo VALUES ('af690230-84f3-45ea-a960-fc3d4bc99f65','2023-06-05','2023-06-01', false, 'Tarea de prueba 1');
 INSERT INTO todo VALUES ('8daccd58-6131-45d4-8a6d-9e14931598bc','2023-06-08','2023-06-02', false, 'Tarea de prueba 2');
 INSERT INTO todo VALUES ('b967e9b5-29eb-4b82-84a0-14c06c700e70','2023-06-08','2023-06-03', false, 'Tarea de prueba 3');
 INSERT INTO todo VALUES ('b5806ced-08b5-4019-9785-458a0aecd820','2023-06-08','2023-06-04', false, 'Tarea de prueba 4');

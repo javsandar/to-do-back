@@ -41,7 +41,6 @@ public class TodoRepositoryMongoAdapter implements TodoRepository {
                 query.addCriteria(c);
             }
         }
-        System.out.println(query);
         return query;
     }
 

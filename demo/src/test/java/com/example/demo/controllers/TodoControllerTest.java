@@ -85,7 +85,7 @@ public class TodoControllerTest {
         //when
         when(todoService.getTodosByFilter(any(TodoFilter.class))).thenReturn(expectedResponse);
         String expectedResponseBody = objectMapper.writeValueAsString(expectedResponse);
-        RequestBuilder request = null;
+        RequestBuilder request;
         request = MockMvcRequestBuilders.get("/todos").queryParam("finished", todoFilterRequest.getFinished() != null ? todoFilterRequest.getFinished().toString() : "").queryParam("creationDate", todoFilterRequest.getCreationDate() != null ? todoFilterRequest.getCreationDate().toString() : "").queryParam("expireDate", todoFilterRequest.getExpireDate() != null ? todoFilterRequest.getExpireDate().get(0) : "").contentType(MediaType.APPLICATION_JSON);
         //then
         MvcResult mvcResult = mockMvc.perform(request).andDo(print()).andExpect(status().isOk()).andExpect(content().string(expectedResponseBody)).andReturn();

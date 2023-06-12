@@ -3,6 +3,7 @@ package com.example.demo.services.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Todo {
@@ -64,6 +65,19 @@ public class Todo {
 
     public void setExpireDate(LocalDate expireDate) {
         this.expireDate = expireDate;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Todo that = (Todo) o;
+        return isFinished == that.isFinished && Objects.equals(id, that.id) && Objects.equals(text, that.text) && Objects.equals(creationDate, that.creationDate) && Objects.equals(expireDate, that.expireDate);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, text, isFinished, creationDate, expireDate);
     }
 
     @Override
